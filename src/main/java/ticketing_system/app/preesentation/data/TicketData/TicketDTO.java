@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ticketing_system.app.percistance.Entities.TicketEntities.Task;
 import ticketing_system.app.percistance.Entities.User;
+import ticketing_system.app.percistance.Enums.TicketStatus;
 
 import java.sql.Timestamp;
 import java.util.List;
