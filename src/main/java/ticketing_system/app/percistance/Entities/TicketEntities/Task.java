@@ -1,4 +1,4 @@
-package ticketing_system.app.percistance.Entities;
+package ticketing_system.app.percistance.Entities.TicketEntities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
