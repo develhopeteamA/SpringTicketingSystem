@@ -5,3 +5,7 @@ A ticket has been resolved so the agent wants to change the status from pending 
 An agent wants to add a tag to a ticket
 An admin wants to reassing a ticket
 D
+
+TODO:
+Update deletes the ticket and creates a new ticket instead of updating the ticket
+Create tests and javadocs
