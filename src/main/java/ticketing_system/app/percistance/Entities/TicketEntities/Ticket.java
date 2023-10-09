@@ -47,6 +47,7 @@ public class Ticket {
         this.priorityLevel = priorityLevel;
         this.deadlineDate = deadlineDate;
     }
+
 }
 
 
