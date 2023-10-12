@@ -26,6 +26,7 @@ public class Ticket {
     private String tags;
     private TicketPriorityLevel priorityLevel; //use enum
     @ManyToOne
+    @JoinColumn(name="user_id")
     private User agentAssigned; //userID from User table
     @OneToMany
     private List<Task> subTasks;

@@ -130,4 +130,54 @@ class TicketServiceImplementationTest {
         verify(ticketRepository, times(1)).deleteById(ticketId);
         assertThat(ticketRepository.getTicketByTicketId(ticketId)).isNull();
     }
+    @Test
+    void updateTicketStatus() {
+        // Create a sample DTO and entity
+        Long ticketId = 1L;
+        TicketStatus ticketStatus = TicketStatus.OPEN;
+        TicketDTO updatedTicket = new TicketDTO();
+        Ticket ticketEntity = new Ticket();
+        ticketEntity.setTicketId(ticketId);
+
+        /*When and Then*/  // Mock behavior for modelMapper and ticketRepository
+        when(ticketRepository.getTicketByTicketId(ticketId)).thenReturn(ticketEntity);
+        ticketEntity.setTicketStatus(ticketStatus);
+        when(ticketRepository.save(ticketEntity)).thenReturn(ticketEntity);
+        when(modelMapper.map(ticketEntity, TicketDTO.class)).thenReturn(updatedTicket);
+
+
+        // Perform the service method
+        TicketDTO actualTicket = ticketService.updateTicketStatus(ticketId, ticketStatus);
+
+        // Verify interactions and assertions
+        verify(ticketRepository, times(1)).getTicketByTicketId(ticketId);
+//        verify(ticketRepository, times(1)).save(ticketEntity);
+        verify(modelMapper, times(1)).map(ticketEntity, TicketDTO.class);
+        assertThat(actualTicket).isEqualTo(updatedTicket);
+    }
+    @Test
+    void updateTicketPriorityLevel() {
+        // Create a sample DTO and entity
+        Long ticketId = 1L;
+        TicketPriorityLevel ticketPriorityLevel  = TicketPriorityLevel.MEDIUM;
+        TicketDTO updatedTicket = new TicketDTO();
+        Ticket ticketEntity = new Ticket();
+        ticketEntity.setTicketId(ticketId);
+
+        /*When and Then*/  // Mock behavior for modelMapper and ticketRepository
+        when(ticketRepository.getTicketByTicketId(ticketId)).thenReturn(ticketEntity);
+        ticketEntity.setPriorityLevel(ticketPriorityLevel);
+        when(ticketRepository.save(ticketEntity)).thenReturn(ticketEntity);
+        when(modelMapper.map(ticketEntity, TicketDTO.class)).thenReturn(updatedTicket);
+
+
+        // Perform the service method
+        TicketDTO actualTicket = ticketService.updateTicketPriorityLevel(ticketId, ticketPriorityLevel);
+
+        // Verify interactions and assertions
+        verify(ticketRepository, times(1)).getTicketByTicketId(ticketId);
+//        verify(ticketRepository, times(1)).save(ticketEntity);
+        verify(modelMapper, times(1)).map(ticketEntity, TicketDTO.class);
+        assertThat(actualTicket).isEqualTo(updatedTicket);
+    }
 }
