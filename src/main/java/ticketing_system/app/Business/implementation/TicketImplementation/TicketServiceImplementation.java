@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ticketing_system.app.Business.services.TicketServices.TicketService;
 import ticketing_system.app.percistance.Entities.TicketEntities.Ticket;
+import ticketing_system.app.percistance.Enums.TicketPriorityLevel;
+import ticketing_system.app.percistance.Enums.TicketStatus;
 import ticketing_system.app.percistance.repositories.TicketRepositories.TicketRepository;
 import ticketing_system.app.preesentation.data.TicketData.TicketDTO;
 
@@ -48,8 +50,8 @@ public class TicketServiceImplementation implements TicketService {
     @Override
     public TicketDTO updateTicket(Long id, TicketDTO ticketDTO) {
         Ticket ticket = convertToTicket(ticketDTO);
-        if (getTicket(id) != null){
-            deleteTicket(id);
+        if (ticketRepository.getTicketByTicketId(id) != null){
+            ticket.setTicketId(id);
             Ticket updatedTicket = ticketRepository.save(ticket);
             return  convertToDto(updatedTicket);
         } else {
@@ -60,5 +62,46 @@ public class TicketServiceImplementation implements TicketService {
     @Override
     public void deleteTicket(Long id) {
         ticketRepository.deleteById(id);
+    }
+
+    @Override
+    public TicketDTO assignTicket(Long ticketId, String userEmail) {
+        if (getTicket(ticketId) != null){
+            //check is user performing action is admin
+//            User user = findUserByEmail(userEmail);
+//            Ticket assignedTicket = ticketRepository.getTicketByAgentAssigned(user);
+//            return  convertToDto(assignedTicket);
+            return null;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public TicketDTO updateTicketStatus(Long ticketId, TicketStatus ticketStatus) {
+        Ticket ticket = ticketRepository.getTicketByTicketId(ticketId);
+        if (ticket != null){
+            if(ticketStatus == TicketStatus.CLOSED){
+                //check is user performing action is admin
+                return null;
+            }
+            ticket.setTicketStatus(ticketStatus);
+            ticketRepository.save(ticket);
+            return convertToDto(ticket);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public TicketDTO updateTicketPriorityLevel(Long ticketId, TicketPriorityLevel ticketPriorityLevel) {
+        Ticket ticket = ticketRepository.getTicketByTicketId(ticketId);
+        if (ticket != null){
+            ticket.setPriorityLevel(ticketPriorityLevel);
+            ticketRepository.save(ticket);
+            return convertToDto(ticket);
+        } else {
+            return null;
+        }
     }
 }

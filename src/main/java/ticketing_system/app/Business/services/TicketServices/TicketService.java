@@ -1,5 +1,7 @@
 package ticketing_system.app.Business.services.TicketServices;
 
+import ticketing_system.app.percistance.Enums.TicketPriorityLevel;
+import ticketing_system.app.percistance.Enums.TicketStatus;
 import ticketing_system.app.preesentation.data.TicketData.TicketDTO;
 
 public interface TicketService {
@@ -7,5 +9,9 @@ public interface TicketService {
     TicketDTO getTicket(Long ticketId);
     TicketDTO updateTicket(Long id, TicketDTO ticketDTO);
     void deleteTicket(Long id);
+    TicketDTO assignTicket(Long ticketId, String userEmail);
 
+    TicketDTO updateTicketStatus(Long ticketId, TicketStatus ticketStatus);
+
+    TicketDTO updateTicketPriorityLevel(Long ticketId, TicketPriorityLevel ticketPriorityLevel);
 }
