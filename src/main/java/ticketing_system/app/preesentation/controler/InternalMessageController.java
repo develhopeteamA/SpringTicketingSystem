@@ -1,12 +1,8 @@
 package ticketing_system.app.preesentation.controler;
 
-import ch.qos.logback.core.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import ticketing_system.app.Business.servises.InternalMessageService;
 import ticketing_system.app.Business.servises.User_service;
 import ticketing_system.app.percistance.Entities.InternalMessage;
@@ -18,24 +14,45 @@ import java.util.List;
 @RequestMapping("/messages")
 public class InternalMessageController {
 
-    @Autowired
-    private InternalMessageService internalMessageService;
+    private final InternalMessageService internalMessageService;
+    private final User_service user_service;
 
-    @GetMapping
-    public String viewMessages(Model model) {
-        // Implement logic to retrieve and display messages
-        List<InternalMessage> messages = internalMessageService.getAllMessagesForUser(currentUser); // Implement currentUser retrieval
-        model.addAttribute("messages", messages);
-        return "message/list"; // Thymeleaf template
+    @Autowired
+    public InternalMessageController(InternalMessageService internalMessageService, UserService userService) {
+        this.internalMessageService = internalMessageService;
+        this.user_service = user_service;
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<InternalMessage> getAllMessagesForUser(@PathVariable Long userId) {
+        User user = user_service.getUserById(userId);
+        return internalMessageService.getAllMessagesForUser(user);
     }
 
     @PostMapping("/send")
-    public String sendMessage(@RequestParam("receiverId") Long receiverId, @RequestParam("content") String content) {
-        // Implement logic to send a message
-        User sender = currentUser; // Implement currentUser retrieval
-        User receiver = User_service.getUserById(receiverId);
+    public void sendMessage(@RequestParam("senderId") Long senderId, @RequestParam("receiverId") Long receiverId, @RequestParam("content") String content) {
+        User sender = user_service.getUserById(senderId);
+        User receiver = user_service.getUserById(receiverId);
         internalMessageService.sendMessage(sender, receiver, content);
-        return "redirect:/messages";
+    }
+
+    @GetMapping("/unread/user/{userId}")
+    public List<InternalMessage> getUnreadMessagesForUser(@PathVariable Long userId) {
+        User user = user_service.getUserById(userId);
+        return internalMessageService.getUnreadMessagesForUser(user);
+    }
+
+    @PutMapping("/markAsRead/{messageId}")
+    public void markMessageAsRead(@PathVariable Long messageId) {
+        InternalMessage message = internalMessageService.getMessageById(messageId);
+        internalMessageService.markMessageAsRead(message);
+    }
+
+    @GetMapping("/conversation/{user1Id}/{user2Id}")
+    public List<InternalMessage> getConversationBetweenUsers(@PathVariable Long user1Id, @PathVariable Long user2Id) {
+        User user1 = user_service.getUserById(user1Id);
+        User user2 = user_service.getUserById(user2Id);
+        return internalMessageService.getAllMessagesBetweenUsers(user1, user2);
     }
 
     // Other messaging-related controller methods
