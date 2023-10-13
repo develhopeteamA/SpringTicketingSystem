@@ -1,6 +1,6 @@
 package ticketing_system.app.percistance.Entities.userEntities;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 
 import java.sql.Timestamp;

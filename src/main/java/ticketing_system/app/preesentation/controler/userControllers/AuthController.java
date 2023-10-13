@@ -1,8 +1,7 @@
 package ticketing_system.app.preesentation.controler.userControllers;
 
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ticketing_system.app.Business.implementation.userServiceImplementations.JwtTokenProviderImpl;
 import ticketing_system.app.Business.implementation.userServiceImplementations.UserImpematation;
 import ticketing_system.app.percistance.Entities.userEntities.Users;
-import ticketing_system.app.preesentation.data.userDTOs.UserDTO;
 import ticketing_system.app.preesentation.data.userDTOs.UserResponseDTO;
 import ticketing_system.app.preesentation.data.userDTOs.UserSignRequestDTO;
 
@@ -31,12 +29,12 @@ import ticketing_system.app.preesentation.data.userDTOs.UserSignRequestDTO;
  * UserSignRequestDTO userSignRequest = new UserSignRequestDTO("user@example.com", "password");
  * ResponseEntity<?> loginResponse = authController.signIn(userSignRequest);
  *
- * @author Maron
+ * @author [Your Name]
  * @version 1.0
  */
 @RestController
 @RequestMapping("/api/v1/auth")
-@Tag(name = "Login endpoint",description = "authenticate user")
+@Api(value = "Login Endpoint")
 public class AuthController {
 
     @Lazy
@@ -47,8 +45,7 @@ public class AuthController {
     JwtTokenProviderImpl tokenProvider;
 
 
-    //@ApiOperation(value = "Login REST API")
-    @Operation(description = "Login REST API")
+    @ApiOperation(value = "Login REST API")
     @PostMapping("/signIn")
     public ResponseEntity<?> signIn(@RequestBody UserSignRequestDTO userSignRequest) {
         String email = userSignRequest.getEmail();
