@@ -1,14 +1,6 @@
-package ticketing_system.app.preesentation.controler;
+package ticketing_system.app.preesentation.controler.userControllers;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import ticketing_system.app.Business.servises.User_service;
-import ticketing_system.app.preesentation.data.UserDTO;
-
+/*
 @RestController
 @RequestMapping(value = {"/api/v1/users"})
 @AllArgsConstructor
@@ -30,6 +22,6 @@ public class User_contraler {
     @Operation(summary = "delete a user")
     public void deleteUser(@PathVariable("id") long id){
 
-        this.userService.deleteUserById(id);
+        //this.userService.deleteUserById(id);
     }
-}
+}*/
