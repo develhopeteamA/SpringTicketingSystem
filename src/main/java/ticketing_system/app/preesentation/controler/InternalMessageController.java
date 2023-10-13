@@ -18,7 +18,7 @@ public class InternalMessageController {
     private final User_service user_service;
 
     @Autowired
-    public InternalMessageController(InternalMessageService internalMessageService, UserService userService) {
+    public InternalMessageController(InternalMessageService internalMessageService, User_service user_service) {
         this.internalMessageService = internalMessageService;
         this.user_service = user_service;
     }

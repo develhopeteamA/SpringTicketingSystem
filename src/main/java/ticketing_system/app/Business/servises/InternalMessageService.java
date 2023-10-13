@@ -29,6 +29,10 @@ public class InternalMessageService {
     }
 
 
+    public InternalMessage getMessageById(Long messageId) {
+        return internalMessageRepository.findById(messageId)
+                .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+    }
 
     public List<InternalMessage> getAllMessagesBetweenUsers(User user1, User user2) {
 
