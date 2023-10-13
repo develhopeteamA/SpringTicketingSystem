@@ -28,7 +28,7 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name="user_id")
     private User agentAssigned; //userID from User table
-    @OneToMany
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Task> subTasks;
     private String attachments;
     private Timestamp deadlineDate;

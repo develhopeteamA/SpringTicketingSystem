@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import ticketing_system.app.Business.implementation.TicketImplementation.TicketServiceImplementation;
 import ticketing_system.app.percistance.Enums.TicketPriorityLevel;
 import ticketing_system.app.percistance.Enums.TicketStatus;
+import ticketing_system.app.preesentation.data.TicketData.TaskDTO;
+import ticketing_system.app.preesentation.data.TicketData.TaskListDTO;
 import ticketing_system.app.preesentation.data.TicketData.TicketDTO;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/ticket")
@@ -67,5 +71,12 @@ public class TicketController {
     @Operation(summary = "Retrieve and update ticket priority", method="PUT")
     public ResponseEntity<TicketDTO> updateTicketPriorityLevel(@RequestParam(value = "ticketId") Long ticketId, @RequestParam(value = "ticketPriorityLevel") TicketPriorityLevel ticketPriorityLevel){
         return ResponseEntity.ok(ticketService.updateTicketPriorityLevel(ticketId, ticketPriorityLevel)) ;
+    }
+
+    @PutMapping(value = "/add-task")
+    @Operation(summary = "Add task to an exising ticket", method="PUT")
+    public ResponseEntity<?> addTaskToTicket(@RequestParam(value = "ticketId") Long ticketId, @RequestBody TaskListDTO taskList){
+//        ticketService.addTaskToTicket(ticketId, taskList.getTasks())
+        return ResponseEntity.ok(ticketService.addTaskToTicket(ticketId, taskList.getTasks())) ;
     }
 }

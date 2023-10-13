@@ -6,8 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+
 @SpringBootApplication
 @EnableTransactionManagement
+
 public class TicketingSystemApplication {
 
     public static void main(String[] args) {
@@ -19,6 +21,7 @@ public class TicketingSystemApplication {
     public ModelMapper modelMapper(){
     return new ModelMapper();
     }
+
 
 }
 

@@ -9,9 +9,11 @@ import lombok.Setter;
 @Getter
 public class Task {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false, updatable = false)
     private Long id;
     private String description;
     private boolean complete;
+    @ManyToOne
+    private Ticket ticket;
 }

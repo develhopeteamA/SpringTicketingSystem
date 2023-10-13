@@ -6,11 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ticketing_system.app.Business.services.TicketServices.TicketService;
+import ticketing_system.app.percistance.Entities.TicketEntities.Task;
 import ticketing_system.app.percistance.Entities.TicketEntities.Ticket;
 import ticketing_system.app.percistance.Enums.TicketPriorityLevel;
 import ticketing_system.app.percistance.Enums.TicketStatus;
 import ticketing_system.app.percistance.repositories.TicketRepositories.TicketRepository;
+import ticketing_system.app.preesentation.data.TicketData.TaskDTO;
 import ticketing_system.app.preesentation.data.TicketData.TicketDTO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -23,7 +28,7 @@ public class TicketServiceImplementation implements TicketService {
         this.modelMapper = modelMapper;
     }
 
-    private TicketDTO convertToDto(Ticket ticket){
+    private TicketDTO convertToTicketDto(Ticket ticket){
 
         return modelMapper.map(ticket, TicketDTO.class);
     }
@@ -32,11 +37,21 @@ public class TicketServiceImplementation implements TicketService {
 
         return modelMapper.map(ticketDTO, Ticket.class);
     }
+
+    private Task convertToTask(TaskDTO taskDTO){
+
+        return modelMapper.map(taskDTO, Task.class);
+    }
+
+    private TaskDTO convertToTaskDto(Task task){
+
+        return modelMapper.map(task, TaskDTO.class);
+    }
     @Override
     public TicketDTO createTicket(TicketDTO ticketDTO) {
         Ticket ticket = convertToTicket(ticketDTO);
         Ticket savedTicket = this.ticketRepository.save(ticket);
-        return convertToDto(savedTicket);
+        return convertToTicketDto(savedTicket);
     }
 
     @Override
@@ -45,7 +60,7 @@ public class TicketServiceImplementation implements TicketService {
         if (ticket == null){
             return null;
         }
-        return convertToDto(ticket);
+        return convertToTicketDto(ticket);
     }
     @Override
     public TicketDTO updateTicket(Long id, TicketDTO ticketDTO) {
@@ -53,7 +68,7 @@ public class TicketServiceImplementation implements TicketService {
         if (ticketRepository.getTicketByTicketId(id) != null){
             ticket.setTicketId(id);
             Ticket updatedTicket = ticketRepository.save(ticket);
-            return  convertToDto(updatedTicket);
+            return  convertToTicketDto(updatedTicket);
         } else {
             return null;
         }
@@ -87,7 +102,7 @@ public class TicketServiceImplementation implements TicketService {
             }
             ticket.setTicketStatus(ticketStatus);
             ticketRepository.save(ticket);
-            return convertToDto(ticket);
+            return convertToTicketDto(ticket);
         } else {
             return null;
         }
@@ -99,7 +114,23 @@ public class TicketServiceImplementation implements TicketService {
         if (ticket != null){
             ticket.setPriorityLevel(ticketPriorityLevel);
             ticketRepository.save(ticket);
-            return convertToDto(ticket);
+            return convertToTicketDto(ticket);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public TicketDTO addTaskToTicket(Long ticketId, List<TaskDTO> taskDTOList) {
+        Ticket ticket = ticketRepository.getTicketByTicketId(ticketId);
+        List<Task> taskList = new ArrayList<>();
+        if(ticket != null){
+            for (TaskDTO taskDTO:taskDTOList ) {
+                taskList.add(convertToTask(taskDTO));
+            }
+            ticket.setSubTasks(taskList);
+            ticketRepository.save(ticket);
+            return convertToTicketDto(ticket);
         } else {
             return null;
         }
