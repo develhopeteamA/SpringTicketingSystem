@@ -81,9 +81,6 @@ public class DepartmentServiceImpl implements DepartmentService {
             throw new IllegalArgumentException("Item description can neither be null nor blank");
         }
 
-        if (departmentDTO == null) {
-            throw new IllegalArgumentException("Item cannot be null");
-        }
         Department department = convertToDepartment(departmentDTO);
         //set created on
         department.setCreatedOn(currentTimestampFormatted);
