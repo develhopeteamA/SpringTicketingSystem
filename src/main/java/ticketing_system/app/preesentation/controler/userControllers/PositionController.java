@@ -1,7 +1,9 @@
 package ticketing_system.app.preesentation.controler.userControllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+//import io.swagger.annotations.Api;
+//import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +31,7 @@ import ticketing_system.app.preesentation.data.userDTOs.PositionDTO;
  */
 @RestController
 @RequestMapping("api/v1/position")
-@Api(value = "CRUD Rest APIs for position")
+@Tag(name = "CRUD Rest APIs for position")
 public class PositionController {
         private PositionServiceImpl positionService;
 
@@ -38,7 +40,7 @@ public class PositionController {
             this.positionService = positionService;
         }
 
-    @ApiOperation(value = "Create position REST API")
+    @Operation(description = "Create position REST API")
         @PostMapping("/create")
         public ResponseEntity<?> createPosition(@RequestHeader(name = "Authorization") String authorizationHeader,@RequestParam("positionCreatedEmail") String positionCreatedEmail, @RequestParam("departmentName") String departmentName, @RequestBody PositionDTO positionDTO){
             try {
@@ -51,7 +53,7 @@ public class PositionController {
             }
         }
 
-    @ApiOperation(value = "Update position by Id REST API")
+    @Operation(description = "Update position by Id REST API")
         @PutMapping("/update/{positionId}")
         public ResponseEntity<?> updateUser(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("positionId") Long positionId,@RequestParam("userUpdatedEmail") String userUpdatedEmail,@RequestParam("departmentName") String departmentName, @RequestBody PositionDTO positionDTO){
             try {
@@ -63,7 +65,7 @@ public class PositionController {
             }
         }
 
-    @ApiOperation(value = "Get all positions REST API")
+    @Operation(description = "Get all positions REST API")
     @GetMapping("/retrieve")
     public ResponseEntity<?> retrievePositions(@RequestHeader(name = "Authorization") String authorizationHeader){
         try {
@@ -77,7 +79,7 @@ public class PositionController {
         }
     }
 
-    @ApiOperation(value = "Get position by Id REST API")
+    @Operation(description = "Get position by Id REST API")
     @GetMapping("/retrieveById/{positionId}")
     public ResponseEntity<?> retrievePositionById(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("positionId") Long positionId){
         try {
@@ -88,7 +90,7 @@ public class PositionController {
         }
     }
 
-    @ApiOperation(value = "Delete Position by Id REST API")
+    @Operation(description = "Delete Position by Id REST API")
     @DeleteMapping("/deleteById/{positionId}")
     public ResponseEntity<?> deletePositionById(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("positionId") Long positionId){
         try {

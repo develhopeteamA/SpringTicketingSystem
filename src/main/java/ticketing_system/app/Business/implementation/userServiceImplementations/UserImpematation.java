@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 @Lazy
-public class UserImpematation implements UserService {
+public class UserImpematation implements UserService  {
 
     Timestamp currentTimestamp = Timestamp.from(Instant.now());
     String pattern = "yyyy-MM-dd HH:mm:ss";

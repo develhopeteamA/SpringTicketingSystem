@@ -1,7 +1,9 @@
 package ticketing_system.app.preesentation.controler.userControllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+//import io.swagger.annotations.Api;
+//import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,13 +31,13 @@ import ticketing_system.app.preesentation.data.userDTOs.RoleDTO;
  */
 @RestController
 @RequestMapping("/api/v1/role")
-@Api(value = "CRUD Rest APIs for role")
+@Tag(name = "CRUD Rest APIs for role")
 public class RoleController {
 
     @Autowired
         private RoleServiceImpl roleService;
 
-    @ApiOperation(value = "Create role REST API")
+    @Operation(description = "Create role REST API")
         @PostMapping("/create")
         public ResponseEntity<?> createRole(@RequestHeader(name = "Authorization") String authorizationHeader,@RequestParam("roleCreatedEmail") String roleCreatedEmail, @RequestBody RoleDTO roleDTO){
             try {
@@ -48,7 +50,7 @@ public class RoleController {
             }
         }
 
-    @ApiOperation(value = "Update role by Id REST API")
+    @Operation(description = "Update role by Id REST API")
         @PutMapping("/update/{roleId}")
         public ResponseEntity<?> updateRole(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("roleId") Long roleId,@RequestParam("roleUpdatedEmail") String roleUpdatedEmail, @RequestBody RoleDTO roleDTO){
             try {
@@ -60,7 +62,7 @@ public class RoleController {
             }
         }
 
-    @ApiOperation(value = "Get all roles REST API")
+    @Operation(description = "Get all roles REST API")
         @GetMapping("/retrieve")
         public ResponseEntity<?> retrieveRoles(@RequestHeader(name = "Authorization") String authorizationHeader){
         try {
@@ -74,7 +76,7 @@ public class RoleController {
         }
         }
 
-    @ApiOperation(value = "Get role by Id REST API")
+    @Operation(description = "Get role by Id REST API")
         @GetMapping("/retrieveById/{roleId}")
         public ResponseEntity<?> retrieveRoleById(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("roleId") Long roleId){
             try {
@@ -85,7 +87,7 @@ public class RoleController {
             }
         }
 
-    @ApiOperation(value = "Delete role by Id REST API")
+    @Operation(description = "Delete role by Id REST API")
         @DeleteMapping("/deleteById/{roleId}")
         public ResponseEntity<?> deleteRoleById(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("roleId") Long roleId){
             try {

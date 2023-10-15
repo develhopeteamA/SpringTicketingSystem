@@ -1,16 +1,19 @@
 package ticketing_system.app.percistance.Entities.userEntities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+//import io.swagger.annotations.ApiModel;
+//import io.swagger.annotations.ApiModelProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import ticketing_system.app.percistance.Entities.userEntities.Positions;
 import ticketing_system.app.percistance.Entities.userEntities.Role;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 
 /**
  * The `Users` class represents a user entity in the ticketing system.
@@ -47,56 +50,55 @@ import java.sql.Timestamp;
 @Setter
 @EqualsAndHashCode
 @Table(name = "users")
-@ApiModel(description = "User model information")
-public class Users {
+public class Users implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", insertable = false, updatable = false)
-    @ApiModelProperty(value = "User id")
+    //@ApiModelProperty(value = "User id")
     private Long id;
 
     @Column(name = "first_name")
-    @ApiModelProperty(value = "User first name")
+   // @ApiModelProperty(value = "User first name")
     private String firstname;
 
-    @ApiModelProperty(value = "User surname")
+    //@ApiModelProperty(value = "User surname")
     @Column(name = "surname")
     private String surname;
 
     @Column(name = "password")
-    @ApiModelProperty(value = "User password")
+    //@ApiModelProperty(value = "User password")
     private String password;
 
 
-    @ApiModelProperty(value = "User position")
+   // @ApiModelProperty(value = "User position")
     @ManyToOne(targetEntity = Positions.class)
     @JoinColumn(name = "position_id", insertable = true, updatable = true)
     private Positions positions;
 
     @ManyToOne(targetEntity = Role.class)
     @JoinColumn(name = "role_id")
-    @ApiModelProperty(value = "User role")
+    //@ApiModelProperty(value = "User role")
     private Role role;
 
 
     @Column(name = "created_by")
-    @ApiModelProperty(value = "User creator")
+   // @ApiModelProperty(value = "User creator")
     private int createdBy;
 
     @Column(name = "created_on")
-    @ApiModelProperty(value = "User creation time")
+    //@ApiModelProperty(value = "User creation time")
     private Timestamp createdOn;
 
-    @ApiModelProperty(value = "User Updater")
+    //@ApiModelProperty(value = "User Updater")
     @Column(name = "updated_by")
     private Long updatedBy;
 
-    @ApiModelProperty(value = "User updation time")
+    //@ApiModelProperty(value = "User updation time")
     @Column(name = "updated_on")
     private Timestamp updatedOn;
 
     @Column(name = "email")
-    @ApiModelProperty(value = "User email")
+   // @ApiModelProperty(value = "User email")
     private String email;
 
     public Users(Long id, String firstname, String surname, String email, String password, Positions positions, Role role, int createdBy, Timestamp createdOn, Long updatedBy, Timestamp updatedOn) {
@@ -132,5 +134,35 @@ public class Users {
                 ", updatedOn=" + updatedOn +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
