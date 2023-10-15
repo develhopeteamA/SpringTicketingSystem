@@ -1,7 +1,9 @@
 package ticketing_system.app.preesentation.controler.userControllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+//import io.swagger.annotations.Api;
+//import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +31,8 @@ import ticketing_system.app.preesentation.data.userDTOs.DepartmentDTO;
  * */
 @RestController
 @RequestMapping("/api/v1/department")
-@Api(value = "CRUD Rest APIs for department")
+//@Api(value = "CRUD Rest APIs for department")
+@Tag(name = "CRUD Rest APIs for department")
 public class DepartmentController {
     private DepartmentServiceImpl departmentService;
 
@@ -38,7 +41,7 @@ public class DepartmentController {
         this.departmentService = departmentService;
     }
 
-    @ApiOperation(value = "Create department REST API")
+    @Operation(description = "Create department REST API")
     @PostMapping("/create")
     public ResponseEntity<?> createDepartment(@RequestHeader(name = "Authorization") String authorizationHeader,@RequestParam("departmentCreatedEmail") String departmentCreatedEmail, @RequestParam("departmentDirectorEmail") String departmentDirectorEmail, @RequestBody DepartmentDTO departmentDTO){
         try {
@@ -51,7 +54,7 @@ public class DepartmentController {
         }
     }
 
-    @ApiOperation(value = "update department REST API")
+    @Operation(description = "update department REST API")
     @PutMapping("/update/{departmentId}")
     public ResponseEntity<?> updateDepartment(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("departmentId") Long departmentId,@RequestParam("departmentUpdatedEmail") String departmentUpdatedEmail,@RequestParam("departmentDirectorEmail") String departmentDirectorEmail, @RequestBody DepartmentDTO departmentDTO){
         try {
@@ -63,7 +66,7 @@ public class DepartmentController {
         }
     }
 
-    @ApiOperation(value = "Get all departments REST API")
+    @Operation(description = "Get all departments REST API")
     @GetMapping("/retrieve")
     public ResponseEntity<?> retrievePositions(@RequestHeader(name = "Authorization") String authorizationHeader){
        try {
@@ -78,7 +81,7 @@ public class DepartmentController {
        }
     }
 
-    @ApiOperation(value = "Get department by Id REST API")
+    @Operation(description = "Get department by Id REST API")
     @GetMapping("/retrieveById/{departmentId}")
     public ResponseEntity<?> retrieveDepartmentById(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("departmentId") Long departmentId){
         try {
@@ -89,7 +92,7 @@ public class DepartmentController {
         }
     }
 
-    @ApiOperation(value = "Delete department by Id REST API")
+    @Operation(description = "Delete department by Id REST API")
     @DeleteMapping("/deleteById/{departmentId}")
     public ResponseEntity<?> deleteDepartmentById(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("departmentId") Long departmentId){
         try {

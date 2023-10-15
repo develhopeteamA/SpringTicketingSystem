@@ -1,6 +1,6 @@
 package ticketing_system.app.percistance.Entities.userEntities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.Data;
 import ticketing_system.app.percistance.Entities.userEntities.Department;
 
