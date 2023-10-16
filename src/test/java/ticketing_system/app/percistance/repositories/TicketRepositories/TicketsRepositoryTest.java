@@ -1,20 +1,16 @@
 package ticketing_system.app.percistance.repositories.TicketRepositories;
 
 import org.assertj.core.api.BDDAssertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ticketing_system.app.Business.implementation.TicketImplementation.TicketServiceImplementation;
-import ticketing_system.app.percistance.Entities.TicketEntities.Ticket;
+import ticketing_system.app.percistance.Entities.TicketEntities.Tickets;
 
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TicketRepositoryTest {
+public class TicketsRepositoryTest {
 
     @Mock
     private TicketRepository ticketRepository;
@@ -23,12 +19,12 @@ public class TicketRepositoryTest {
     public void testGetTicketByTicketId() {
         /*Given*/
         Long ticketId = 1L;
-        Ticket expectedTicket = new Ticket();
+        Tickets expectedTicket = new Tickets();
 
         /*When and Then*/
         when(ticketRepository.getTicketByTicketId(ticketId)).thenReturn(expectedTicket);
 
-        Ticket actualTicket = ticketRepository.getTicketByTicketId(ticketId);
+        Tickets actualTicket = ticketRepository.getTicketByTicketId(ticketId);
 
         verify(ticketRepository, times(1)).getTicketByTicketId(ticketId);
 

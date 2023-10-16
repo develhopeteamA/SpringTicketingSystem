@@ -21,6 +21,8 @@ public class User {
     @Column(nullable = false, updatable = false)
     private Long id;
 
-    private String username;
-    private final LocalDate dateCreated = LocalDate.now();
+    private String firstName;
+    private String surname;
+    private String email;
+    private String password;
 }

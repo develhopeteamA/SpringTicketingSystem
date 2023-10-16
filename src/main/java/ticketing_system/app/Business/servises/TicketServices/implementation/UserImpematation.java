@@ -1,4 +1,4 @@
-package ticketing_system.app.Business.implementation;
+package ticketing_system.app.Business.servises.TicketServices.implementation;
 
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
