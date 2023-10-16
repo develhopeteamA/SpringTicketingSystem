@@ -1,6 +1,6 @@
 package ticketing_system.app.percistance.Enums;
 
-public enum TicketPriorityLevel {
+public enum TicketPriority {
     LOW,
     MEDIUM,
     HIGH,

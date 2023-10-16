@@ -1,21 +1,19 @@
 package ticketing_system.app.preesentation.data.TicketData;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.SchemaProperty;
 
-@Setter
-@Getter
-@EqualsAndHashCode
-public class TaskDTO {
-    private Long id;
-    private String description;
-    private boolean complete;
+/**
+ * the task DTO.
+ * @author kamar baraka.*/
 
-    public TaskDTO(){
-    }
+@Schema(title = "Task DTO",name = "TaskDTO",description = "the schema to create tasks")
+public record TaskDTO (
+        @SchemaProperty(name = "description") String description
+) implements DTOType {
 
-    public TaskDTO(String description, boolean complete){
-
+    @Override
+    public String description() {
+        return description;
     }
 }
