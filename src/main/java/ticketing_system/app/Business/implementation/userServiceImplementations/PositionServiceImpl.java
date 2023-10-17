@@ -93,7 +93,7 @@ public class PositionServiceImpl implements PositionService {
     }
 
     @Override
-    public Positions createPosition(String positionCreatedEmail,String departmentName,String token,PositionDTO positionDTO) {
+    public Positions createPosition(String positionCreatedEmail,String departmentName,PositionDTO positionDTO) {
         if (positionDTO.getPositionName().isBlank() || positionDTO.getPositionName() == null) {
             throw new IllegalArgumentException("Item name can neither be null nor blank");
         }
@@ -115,35 +115,27 @@ public class PositionServiceImpl implements PositionService {
         System.out.println(createdByUsers);
         position.setCreatedBy(createdByUsers.getCreatedBy());
 
-        if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
             Positions savedPositions = positionRepository.save(position);
             return savedPositions;
-        }
-        throw new IllegalArgumentException("Only admin can perform");
     }
 
     @Override
-    public List<PositionDTO> retrievePositions(String token) {
-        if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
+    public List<PositionDTO> retrievePositions() {
             return convertToListDTOs(positionRepository.findAll());
-        }
-        throw new IllegalArgumentException("Only admin can perform");
+
     }
 
     @Override
-    public PositionDTO retrievePositionById(Long positionId, String token) {
+    public PositionDTO retrievePositionById(Long positionId) {
         if (positionRepository.existsById(positionId)) {
-            if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
+
                 return this.convertToDto(positionRepository.findById(positionId).get());
-            }else {
-                throw new IllegalArgumentException("Only admin can perform");
-            }
         }
         throw new IllegalArgumentException("Positions not found");
     }
 
     @Override
-    public Positions updatePosition(Long positionId,String positionCreatedEmail,String departmentName,String token, PositionDTO positionDTO) {
+    public Positions updatePosition(Long positionId,String positionCreatedEmail,String departmentName, PositionDTO positionDTO) {
         if (positionRepository.existsById(positionId)){
             System.out.println(positionId);
 
@@ -163,11 +155,8 @@ public class PositionServiceImpl implements PositionService {
             System.out.println(createdByUsers);
             position.setUpdatedBy(createdByUsers.getCreatedBy());
 
-            if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
+
                 return positionRepository.save(position);
-            }else {
-                throw new IllegalArgumentException("Only admin can perform");
-            }
         }
         throw new IllegalArgumentException("Positions not found");
 
@@ -186,14 +175,10 @@ public class PositionServiceImpl implements PositionService {
     }
 
     @Override
-    public boolean deletePositionById(Long positionId,String token) {
+    public boolean deletePositionById(Long positionId) {
         if (positionRepository.existsById(positionId)){
-            if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
             positionRepository.deleteById(positionId);
-            return true;}
-            else {
-                throw new IllegalArgumentException("Only admin can perform");
-            }
+            return true;
         }
         throw new IllegalArgumentException("Positions not found");
 

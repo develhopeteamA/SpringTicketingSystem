@@ -73,7 +73,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public DepartmentDTO createDepartment(String departmentCreatedEmail,String departmentDirectorEmail,String token,DepartmentDTO departmentDTO) {
+    public DepartmentDTO createDepartment(String departmentCreatedEmail,String departmentDirectorEmail,DepartmentDTO departmentDTO) {
         if (departmentDTO.getDepartmentName().isBlank() || departmentDTO.getDepartmentName() == null) {
             throw new IllegalArgumentException("Item name can neither be null nor blank");
         }
@@ -98,37 +98,26 @@ public class DepartmentServiceImpl implements DepartmentService {
         department.setCreatedBy(createdByUsers.getCreatedBy());
 
         //Department departments = convertToDepartment(department);
-        if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
 
         return this.convertToDto(departmentRepository.save(department));
-        }else {
-            throw new IllegalArgumentException("Only admin can perform");
-        }
     }
 
     @Override
-    public List<DepartmentDTO> retrieveDepartments(String token) {
-        if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
+    public List<DepartmentDTO> retrieveDepartments() {
             return this.convertToListDTOs(departmentRepository.findAll());
-        }
-        else {throw new IllegalArgumentException("Only admin can perform");}
     }
 
     @Override
-    public DepartmentDTO retrieveDepartmentById(Long departmentId,String token) {
+    public DepartmentDTO retrieveDepartmentById(Long departmentId) {
         if (departmentRepository.existsById(departmentId)) {
-            if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
                 return this.convertToDto(departmentRepository.findById(departmentId).get());
-            }else {
-                throw new IllegalArgumentException("Only admin can perform");
-            }
         }
         throw new IllegalArgumentException("Department not found");
     }
 
 
     @Override
-    public DepartmentDTO updateDepartment(Long departmentId,String departmentCreatedEmail,String departmentDirectorEmail,String token, DepartmentDTO departmentDTO) {
+    public DepartmentDTO updateDepartment(Long departmentId,String departmentCreatedEmail,String departmentDirectorEmail, DepartmentDTO departmentDTO) {
         if (departmentRepository.existsById(departmentId)){
 
             Department department = convertToDepartment(departmentDTO);
@@ -146,11 +135,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             Users createdByUsers = userImpematation.retrieveUserByEmail(departmentCreatedEmail);
             System.out.println(createdByUsers);
             department.setUpdatedBy(createdByUsers.getCreatedBy());
-            if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
              return convertToDto(departmentRepository.save(department));
-        }else {
-            throw new IllegalArgumentException("Only admin can perform");
-            }
         }
         throw new IllegalArgumentException("Department not found");
     }
@@ -165,14 +150,10 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public boolean deleteDepartmentById(Long departmentId,String token) {
+    public boolean deleteDepartmentById(Long departmentId) {
         if (departmentRepository.existsById(departmentId)) {
-            if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
                 departmentRepository.deleteById(departmentId);
                 return true;
-            }else {
-                throw new IllegalArgumentException("Only admin can perform");
-            }
         }
         throw new IllegalArgumentException("Department not found");
     }

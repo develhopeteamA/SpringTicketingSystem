@@ -30,7 +30,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Data
-@Table(name = "role")
+@Table(name = "authorities")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

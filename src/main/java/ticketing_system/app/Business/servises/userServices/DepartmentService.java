@@ -6,14 +6,14 @@ import ticketing_system.app.preesentation.data.userDTOs.DepartmentDTO;
 import java.util.List;
 
 public interface DepartmentService {
-    DepartmentDTO createDepartment(String departmentCreatedEmail, String departmentDirectorEmail,String token,DepartmentDTO departmentDTO);
-    List<DepartmentDTO> retrieveDepartments(String token);
+    DepartmentDTO createDepartment(String departmentCreatedEmail, String departmentDirectorEmail,DepartmentDTO departmentDTO);
+    List<DepartmentDTO> retrieveDepartments();
 
-    DepartmentDTO retrieveDepartmentById(Long departmentId,String token);
+    DepartmentDTO retrieveDepartmentById(Long departmentId);
 
-    DepartmentDTO updateDepartment(Long departmentId,String departmentCreatedEmail,String departmentDirectorEmail,String token, DepartmentDTO departmentDTO);
+    DepartmentDTO updateDepartment(Long departmentId,String departmentCreatedEmail,String departmentDirectorEmail, DepartmentDTO departmentDTO);
 
     Department retrieveDepartmentByName(String departmentName);
 
-    boolean deleteDepartmentById(Long departmentId,String token);
+    boolean deleteDepartmentById(Long departmentId);
 }
