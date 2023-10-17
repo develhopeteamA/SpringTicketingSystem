@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ticketing_system.app.Business.implementation.userServiceImplementations.UserImpematation;
 import ticketing_system.app.preesentation.data.userDTOs.UserDTO;
@@ -43,43 +44,51 @@ public class UserController {
 
     @Operation(description = "Create user REST API")
     @PostMapping("/create")
-    public ResponseEntity<?> createUser(@RequestHeader(name = "Authorization" ) String authorizationHeader,@RequestParam("userCreatedEmail") String userCreatedEmail,@RequestParam("positionName") String positionName,@RequestParam("roleName") String roleName, @RequestBody UserDTO userDTO){
+    //@PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> createUser(@RequestParam("userCreatedEmail") String userCreatedEmail,@RequestParam("positionName") String positionName,@RequestParam("roleName") String roleName, @RequestBody UserDTO userDTO){
         try {
-            String token = authorizationHeader;
+            //String token = authorizationHeader;
             System.out.println(userCreatedEmail);
-            return ResponseEntity.ok(userImplementation.createUser(userCreatedEmail,roleName,positionName,token, userDTO));
+            return ResponseEntity.ok(userImplementation.createUser(userCreatedEmail,roleName,positionName, userDTO));
         }
          catch (IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(e.getStackTrace());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
 
     @Operation(description = "Update user by Id REST API")
     @PutMapping("/update/{userId}")
-    public ResponseEntity<?> updateUser(@PathVariable("userId") Long userId,@RequestHeader(name = "Authorization") String authorizationHeader,@RequestParam("userUpdatedEmail") String userUpdatedEmail,@RequestParam("positionName") String positionName,@RequestParam("roleName") String roleName, @RequestBody UserDTO userDTO){
+    //@PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> updateUser(@PathVariable("userId") Long userId,@RequestParam("userUpdatedEmail") String userUpdatedEmail,@RequestParam("positionName") String positionName,@RequestParam("roleName") String roleName, @RequestBody UserDTO userDTO){
         try {
-            String token = authorizationHeader;
+            //String token = authorizationHeader;
             System.out.println(userId);
-            return ResponseEntity.ok(userImplementation.updateUser(userId,userUpdatedEmail,roleName,positionName,token,userDTO));
+            return ResponseEntity.ok(userImplementation.updateUser(userId,userUpdatedEmail,roleName,positionName,userDTO));
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @PutMapping("/elevateUserRole")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> updateUserRole(@RequestParam("email") String email, @RequestParam("UserNewRoleName") String newRoleName){
+        return ResponseEntity.ok(userImplementation.updateUserRole(email,newRoleName));
+    }
 
     @Operation(description = "Get all users REST API")
     @GetMapping("/retrieve")
-    public ResponseEntity<?> retrieveUsers(@RequestHeader(name = "Authorization") String authorizationHeader){
-        String token = authorizationHeader;
-        return ResponseEntity.ok(userImplementation.retrieveUsers(token));
+    //@PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> retrieveUsers(){
+       // String token = authorizationHeader;
+        return ResponseEntity.ok(userImplementation.retrieveUsers());
     }
 
     @Operation(description = "Get user by Id REST API")
     @GetMapping("/retrieveById/{userId}")
-    public ResponseEntity<?> retrieveUserById(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("userId") Long userId){
+    public ResponseEntity<?> retrieveUserById(@PathVariable("userId") Long userId){
         try {
-            String token = authorizationHeader;
-            return ResponseEntity.ok(userImplementation.retrieveUserById(userId,token));
+           // String token = authorizationHeader;
+            return ResponseEntity.ok(userImplementation.retrieveUserById(userId));
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -87,10 +96,11 @@ public class UserController {
 
     @Operation(description = "Delete user by Id REST API")
     @DeleteMapping("/deleteById/{userId}")
-    public ResponseEntity<?> deleteUserById(@PathVariable("userId") Long userId,@RequestHeader(name = "Authorization") String authorizationHeader){
+    //@PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> deleteUserById(@PathVariable("userId") Long userId){
         try {
-            String token = authorizationHeader;
-            boolean isDeleted = userImplementation.deleteUserById(userId,token);
+            //String token = authorizationHeader;
+            boolean isDeleted = userImplementation.deleteUserById(userId);
             if (isDeleted){
                 return ResponseEntity.ok("User deleted successfully");
             }

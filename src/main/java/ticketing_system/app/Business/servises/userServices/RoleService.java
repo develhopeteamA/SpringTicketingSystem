@@ -6,13 +6,14 @@ import ticketing_system.app.preesentation.data.userDTOs.RoleDTO;
 import java.util.List;
 
 public interface RoleService {
-    Role createRole(String roleCreatedEmail,String token, RoleDTO roleDTO);
-    List<RoleDTO> retrieveRoles(String token);
+    Role createRole(String roleCreatedEmail, RoleDTO roleDTO);
+    List<RoleDTO> retrieveRoles();
 
-    RoleDTO retrieveRoleById(Long roleId,String token);
+    RoleDTO retrieveRoleById(Long roleId);
 
-    Role updateRole(Long roleId,String roleUpdatedEmail,String token, RoleDTO roleDTO);
+    Role updateRole(Long roleId,String roleUpdatedEmail, RoleDTO roleDTO);
     Role retrieveRoleByName(String roleName);
 
-    boolean deleteRoleById(Long roleId,String token);
+
+    boolean deleteRoleById(Long roleId);
 }

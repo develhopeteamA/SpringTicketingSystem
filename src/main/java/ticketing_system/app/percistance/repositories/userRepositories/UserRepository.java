@@ -1,7 +1,12 @@
 package ticketing_system.app.percistance.repositories.userRepositories;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import ticketing_system.app.percistance.Entities.userEntities.Role;
 import ticketing_system.app.percistance.Entities.userEntities.Users;
 
 /**
@@ -19,4 +24,9 @@ import ticketing_system.app.percistance.Entities.userEntities.Users;
 @Repository
 public interface UserRepository extends JpaRepository<Users,Long> {
     Users findByEmail(String email);
+    @Modifying
+    @Transactional
+    @Query("UPDATE Users u SET u.role = :newRole WHERE u.email = :email")
+    void updateRoleByEmail(@Param("email") String email, @Param("newRole") Role newRole);
+
 }
