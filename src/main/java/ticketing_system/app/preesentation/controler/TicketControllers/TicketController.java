@@ -40,9 +40,9 @@ public class TicketController {
     private final TicketService ticketService;
 
     @GetMapping
-    @Parameter(name = "user role")
+    @Parameter(name = "user role",required = false)
     @Operation(tags = {"Ticket Api"},summary = "get all tickets",description = "get all tickets in the database")
-    public ResponseEntity<List<? extends EntityModel<? extends DTOType>>> getAllTickets(@RequestHeader(value = "ROLE", defaultValue = "USER")
+    public ResponseEntity<List<? extends EntityModel<? extends DTOType>>> getAllTickets(@RequestHeader(value = "ROLE",required = false,defaultValue = "USER")
                                                                                         String  userRole){
 
         /*get all tickets*/
