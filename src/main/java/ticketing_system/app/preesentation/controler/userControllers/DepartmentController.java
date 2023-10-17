@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ticketing_system.app.Business.implementation.userServiceImplementations.DepartmentServiceImpl;
 import ticketing_system.app.preesentation.data.userDTOs.DepartmentDTO;
@@ -43,11 +44,12 @@ public class DepartmentController {
 
     @Operation(description = "Create department REST API")
     @PostMapping("/create")
-    public ResponseEntity<?> createDepartment(@RequestHeader(name = "Authorization") String authorizationHeader,@RequestParam("departmentCreatedEmail") String departmentCreatedEmail, @RequestParam("departmentDirectorEmail") String departmentDirectorEmail, @RequestBody DepartmentDTO departmentDTO){
+    //@PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> createDepartment(@RequestParam("departmentCreatedEmail") String departmentCreatedEmail, @RequestParam("departmentDirectorEmail") String departmentDirectorEmail, @RequestBody DepartmentDTO departmentDTO){
         try {
-            String token = authorizationHeader;
+            //String token = authorizationHeader;
             System.out.println(departmentCreatedEmail);
-            return ResponseEntity.ok(departmentService.createDepartment(departmentCreatedEmail,departmentDirectorEmail,token, departmentDTO));
+            return ResponseEntity.ok(departmentService.createDepartment(departmentCreatedEmail,departmentDirectorEmail, departmentDTO));
         }
         catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -56,11 +58,12 @@ public class DepartmentController {
 
     @Operation(description = "update department REST API")
     @PutMapping("/update/{departmentId}")
-    public ResponseEntity<?> updateDepartment(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("departmentId") Long departmentId,@RequestParam("departmentUpdatedEmail") String departmentUpdatedEmail,@RequestParam("departmentDirectorEmail") String departmentDirectorEmail, @RequestBody DepartmentDTO departmentDTO){
+    //@PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> updateDepartment(@PathVariable("departmentId") Long departmentId,@RequestParam("departmentUpdatedEmail") String departmentUpdatedEmail,@RequestParam("departmentDirectorEmail") String departmentDirectorEmail, @RequestBody DepartmentDTO departmentDTO){
         try {
-            String token = authorizationHeader;
+            //String token = authorizationHeader;
             System.out.println(departmentId);
-            return ResponseEntity.ok(departmentService.updateDepartment(departmentId,departmentUpdatedEmail,departmentDirectorEmail,token,departmentDTO));
+            return ResponseEntity.ok(departmentService.updateDepartment(departmentId,departmentUpdatedEmail,departmentDirectorEmail,departmentDTO));
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -68,14 +71,15 @@ public class DepartmentController {
 
     @Operation(description = "Get all departments REST API")
     @GetMapping("/retrieve")
-    public ResponseEntity<?> retrievePositions(@RequestHeader(name = "Authorization") String authorizationHeader){
+    //@PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> retrievePositions(){
        try {
-           String token = authorizationHeader;
+           //String token = authorizationHeader;
 
-           if (departmentService.retrieveDepartments(token).isEmpty()) {
+           if (departmentService.retrieveDepartments().isEmpty()) {
                return ResponseEntity.notFound().build();
            }
-           return ResponseEntity.ok(departmentService.retrieveDepartments(token));
+           return ResponseEntity.ok(departmentService.retrieveDepartments());
        }catch (IllegalArgumentException e){
            return ResponseEntity.badRequest().body(e.getMessage());
        }
@@ -83,10 +87,11 @@ public class DepartmentController {
 
     @Operation(description = "Get department by Id REST API")
     @GetMapping("/retrieveById/{departmentId}")
-    public ResponseEntity<?> retrieveDepartmentById(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("departmentId") Long departmentId){
+    //@PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> retrieveDepartmentById(@PathVariable("departmentId") Long departmentId){
         try {
-            String token = authorizationHeader;
-            return ResponseEntity.ok(departmentService.retrieveDepartmentById(departmentId,token));
+           // String token = authorizationHeader;
+            return ResponseEntity.ok(departmentService.retrieveDepartmentById(departmentId));
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -94,10 +99,11 @@ public class DepartmentController {
 
     @Operation(description = "Delete department by Id REST API")
     @DeleteMapping("/deleteById/{departmentId}")
-    public ResponseEntity<?> deleteDepartmentById(@RequestHeader(name = "Authorization") String authorizationHeader,@PathVariable("departmentId") Long departmentId){
+    //@PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> deleteDepartmentById(@PathVariable("departmentId") Long departmentId){
         try {
-            String token = authorizationHeader;
-            if (departmentService.deleteDepartmentById(departmentId,token)) {
+            //String token = authorizationHeader;
+            if (departmentService.deleteDepartmentById(departmentId)) {
                 return ResponseEntity.ok("Department successfully deleted");
             }
             else{

@@ -81,7 +81,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Role createRole(String roleCreatedEmail, String token,RoleDTO roleDTO) {
+    public Role createRole(String roleCreatedEmail,RoleDTO roleDTO) {
         if (roleDTO.getRoleName().isBlank() || roleDTO.getRoleName() == null) {
             throw new IllegalArgumentException("Item name can neither be null nor blank");
         }
@@ -99,37 +99,28 @@ public class RoleServiceImpl implements RoleService {
         System.out.println(createdByUsers);
         role.setCreatedBy(createdByUsers.getCreatedBy());
 
-        if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
 
-            return roleRepository.save(role);
-        }
-        throw new IllegalArgumentException("Only admin can create a role");
+        return roleRepository.save(role);
+
     }
 
     @Override
-    public List<RoleDTO> retrieveRoles(String token) {
-        if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
+    public List<RoleDTO> retrieveRoles() {
+
             return convertToListDTOs(roleRepository.findAll());
-        }
-        throw new IllegalArgumentException("Only admin can perform");
     }
 
     @Override
-    public RoleDTO retrieveRoleById(Long roleId,String token) {
+    public RoleDTO retrieveRoleById(Long roleId) {
         if (roleRepository.existsById(roleId)) {
-            if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
                 return this.convertToDto(roleRepository.findById(roleId).get());
-            }else {
-                throw new IllegalArgumentException("Only admin can perform");
-            }
         }
         throw new IllegalArgumentException("Role not found");
     }
 
     @Override
-    public Role updateRole(Long roleId, String roleUpdatedEmail, String token,RoleDTO roleDTO) {
+    public Role updateRole(Long roleId, String roleUpdatedEmail,RoleDTO roleDTO) {
         if (roleRepository.existsById(roleId)){
-            if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
                 Role role = convertToRole(roleDTO);
 
                 //set role id
@@ -143,9 +134,6 @@ public class RoleServiceImpl implements RoleService {
                 System.out.println(createdByUsers);
                 role.setUpdatedBy(createdByUsers.getCreatedBy());
                 return roleRepository.save(role);
-            }else {
-                throw new IllegalArgumentException("Only admin can perform");
-            }
         }
         throw new IllegalArgumentException("Role not found");
 
@@ -158,14 +146,10 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public boolean deleteRoleById(Long roleId,String token) {
+    public boolean deleteRoleById(Long roleId) {
         if (roleRepository.existsById(roleId)){
-            if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
             roleRepository.deleteById(roleId);
             return true;
-            }else {
-                throw new IllegalArgumentException("Only admin can perform");
-            }
 
         }
         throw new IllegalArgumentException("Role not found");

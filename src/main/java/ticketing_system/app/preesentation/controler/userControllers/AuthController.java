@@ -34,9 +34,9 @@ import ticketing_system.app.preesentation.data.userDTOs.UserSignRequestDTO;
  * @author Maron
  * @version 1.0
  */
-@RestController
-@RequestMapping("/api/v1/auth")
-@Tag(name = "Login endpoint",description = "authenticate user")
+//@RestController
+//@RequestMapping("/api/v1/auth")
+//@Tag(name = "Login endpoint",description = "authenticate user")
 public class AuthController {
 
     @Lazy
