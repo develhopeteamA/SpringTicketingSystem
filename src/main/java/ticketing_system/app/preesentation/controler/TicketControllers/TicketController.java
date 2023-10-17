@@ -78,8 +78,8 @@ public class TicketController {
 
     @GetMapping(value = {"byName/{name}"})
     @Operation(summary = "get ticket", description = "get ticket by name")
-    public ResponseEntity<EntityModel<? extends List<? extends DTOType>>> getTicketByName(@RequestHeader(name = "ROLE", defaultValue = "USER") String userRole ,
-                                                                                          @PathVariable("name") String name){
+    public ResponseEntity<List<? extends DTOType>> getTicketByName(@RequestHeader(name = "ROLE", defaultValue = "USER") String userRole ,
+                                                                   @PathVariable("name") String name){
 
         /*get ticket by name*/
         List<Tickets> ticketByName = ticketService.getTicketByName(name);
@@ -95,10 +95,10 @@ public class TicketController {
 
         assert tickets != null;
         /*create an entity model*/
-        EntityModel<? extends List<? extends DTOType>> listEntityModel = EntityModel.of(tickets);
+        //EntityModel<? extends List<? extends DTOType>> listEntityModel = EntityModel.of(tickets);
 
         /*return the response*/
-        return ResponseEntity.ok(listEntityModel);
+        return ResponseEntity.ok(tickets);
 
     }
 
