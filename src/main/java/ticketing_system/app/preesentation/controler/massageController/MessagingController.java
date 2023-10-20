@@ -1,5 +1,7 @@
 package ticketing_system.app.preesentation.controler.massageController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +10,7 @@ import ticketing_system.app.percistance.Entities.Message.Message;
 
 import java.util.List;
 
+@Tag(name="Massaging")
 @RestController
 @RequestMapping("api/v1/messages")
 public class MessagingController {
@@ -20,6 +23,7 @@ public class MessagingController {
     }
 
     @PostMapping("/send")
+    @Operation(summary = "sends massages ")
     public ResponseEntity<Message> sendMessage(@RequestParam("senderId") Long senderId,
                                                @RequestParam("receiverId") Long receiverId,
                                                @RequestParam("content") String content) {
@@ -32,6 +36,7 @@ public class MessagingController {
     }
 
     @GetMapping("/inbox/{userId}")
+    @Operation(summary = "Recieves massages ")
     public ResponseEntity<List<Message>> getMessages(@PathVariable("userId") Long userId) {
         try {
             List<Message> messages = messagingService.getMessages(userId);
@@ -42,6 +47,7 @@ public class MessagingController {
     }
 
     @DeleteMapping("/{messageId}")
+    @Operation(summary = "deletes massages")
     public ResponseEntity<String> deleteMessage(@PathVariable("messageId") Long messageId) {
         try {
             messagingService.deleteMessage(messageId);
@@ -52,6 +58,7 @@ public class MessagingController {
     }
 
     @GetMapping("/search")
+    @Operation(summary = "queries massages")
     public ResponseEntity<List<Message>> searchMessages(@RequestParam("keyword") String keyword) {
         try {
             List<Message> messages = messagingService.searchMessages(keyword);
@@ -62,6 +69,7 @@ public class MessagingController {
     }
 
     @PutMapping("/{messageId}")
+    @Operation(summary = "edits massages")
     public ResponseEntity<Message> editMessage(@PathVariable("messageId") Long messageId,
                                                @RequestParam("content") String content) {
         try {
