@@ -8,7 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
+
 
 @Entity
 @Getter
@@ -23,6 +24,7 @@ public class Message {
     private Long receiverId;
     private String content;
     private Timestamp timestamp;
+
 
     public Message(long l, long l1, String hello) {
     }

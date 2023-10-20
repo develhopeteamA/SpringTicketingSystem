@@ -6,17 +6,27 @@ import ticketing_system.app.Business.servises.MessageService.MessagingService;
 import ticketing_system.app.percistance.Entities.Message.Message;
 import ticketing_system.app.percistance.repositories.MessageRepository.MessageRepository;
 
-import java.security.Timestamp;
+
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.lang.System.currentTimeMillis;
+
 
 @Service
 public class MessagingServiceImpl implements MessagingService {
 
+    java.sql.Timestamp currentTimestamp = java.sql.Timestamp.from(Instant.now());
+    String pattern = "yyyy-MM-dd HH:mm:ss";
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
+    String formattedTimestamp = currentTimestamp.toLocalDateTime().format(dateTimeFormatter);
+    java.sql.Timestamp currentTimestampFormatted = Timestamp.valueOf(formattedTimestamp);
+
     private final MessageRepository messageRepository;
+
 
     @Autowired
     public MessagingServiceImpl(MessageRepository messageRepository) {
@@ -30,6 +40,7 @@ public class MessagingServiceImpl implements MessagingService {
         message.setSenderId(senderId);
         message.setReceiverId(receiverId);
         message.setContent(content);
+        message.setTimestamp(new Timestamp(System.currentTimeMillis()));
         return messageRepository.save(message);
     }
 
@@ -40,6 +51,7 @@ public class MessagingServiceImpl implements MessagingService {
         if (optionalMessage.isPresent()) {
             Message message = optionalMessage.get();
             message.setContent(content);
+            message.setTimestamp(new Timestamp(System.currentTimeMillis()));
             return messageRepository.save(message);
         } else {
             throw new IllegalArgumentException("Message not found");
@@ -48,7 +60,9 @@ public class MessagingServiceImpl implements MessagingService {
 
     @Override
     public List<Message> searchMessages(String keyword) {
-        return null;
+        return messageRepository.findAll().stream()
+                .filter(message -> message.getContent().contains(keyword))
+                .collect(Collectors.toList());
     }
 
 
@@ -63,5 +77,6 @@ public class MessagingServiceImpl implements MessagingService {
     public void deleteMessage(Long messageId) {
         // Implement the logic to delete a message by ID
         messageRepository.deleteById(messageId);
+
     }
 }
