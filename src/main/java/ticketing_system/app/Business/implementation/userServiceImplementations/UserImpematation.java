@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
 import ticketing_system.app.Business.servises.userServices.UserService;
 import ticketing_system.app.percistance.Entities.userEntities.Positions;
@@ -15,9 +18,11 @@ import ticketing_system.app.percistance.repositories.userRepositories.RoleReposi
 import ticketing_system.app.percistance.repositories.userRepositories.UserRepository;
 import ticketing_system.app.preesentation.data.userDTOs.UserDTO;
 
+import javax.sql.DataSource;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -98,6 +103,17 @@ public class UserImpematation implements UserService  {
         return usersList.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+    @Autowired
+    private  JdbcUserDetailsManager userDetailsManager;
+
+    public UserImpematation(DataSource dataSource) {
+        this.userDetailsManager = new JdbcUserDetailsManager(dataSource);
+    }
+
+    public Collection<?> getAuthoritiesForUser(String username) {
+        UserDetails userDetails = userDetailsManager.loadUserByUsername(username);
+        return userDetails.getAuthorities();
     }
 
     @Override

@@ -7,9 +7,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import ticketing_system.app.Business.implementation.userServiceImplementations.UserImpematation;
+import ticketing_system.app.Business.servises.UserService;
 import ticketing_system.app.preesentation.data.userDTOs.UserDTO;
+
+import java.util.Collection;
 
 
 /**
@@ -37,11 +41,21 @@ import ticketing_system.app.preesentation.data.userDTOs.UserDTO;
 public class UserController {
     private UserImpematation userImplementation;
 
+
+    @Autowired
+    private  UserImpematation userService;
+
+
     @Autowired
     public UserController(UserImpematation userImplementation) {
         this.userImplementation = userImplementation;
     }
 
+    @GetMapping("/user/authorities")
+    public ResponseEntity<Collection<?>> getUserAuthorities(@RequestParam String username) {
+        Collection<?> authorities = userImplementation.getAuthoritiesForUser(username);
+        return ResponseEntity.ok(authorities);
+    }
     @Operation(description = "Create user REST API")
     @PostMapping("/create")
     //@PreAuthorize("hasAuthority('admin')")
@@ -70,7 +84,7 @@ public class UserController {
         }
     }
     @PutMapping("/elevateUserRole")
-    @PreAuthorize("hasAuthority('admin')")
+    //@PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> updateUserRole(@RequestParam("email") String email, @RequestParam("UserNewRoleName") String newRoleName){
         return ResponseEntity.ok(userImplementation.updateUserRole(email,newRoleName));
     }
@@ -85,6 +99,7 @@ public class UserController {
 
     @Operation(description = "Get user by Id REST API")
     @GetMapping("/retrieveById/{userId}")
+    //@PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> retrieveUserById(@PathVariable("userId") Long userId){
         try {
            // String token = authorizationHeader;

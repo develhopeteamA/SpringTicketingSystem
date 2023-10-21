@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 //import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,9 +22,11 @@ import ticketing_system.app.Business.implementation.userServiceImplementations.U
 import ticketing_system.app.percistance.Entities.userEntities.Users;
 
 import javax.sql.DataSource;
+import java.util.Collection;
+import java.util.List;
 
 @Configuration
-//@EnableMethodSecurity
+@EnableMethodSecurity
 public class UserConfig {
 
     public DataSource dataSource() {
@@ -49,12 +52,9 @@ public class UserConfig {
                         "INNER JOIN authorities a ON u.role_id = a.role_id " +
                         "WHERE u.username = ?");
 
-
         return  jdbcUserDetailsManager;
 
     }
-
-
 
 
     @Bean

@@ -92,7 +92,7 @@ public class RoleController {
 
     @Operation(description = "Delete role by Id REST API")
         @DeleteMapping("/deleteById/{roleId}")
-    @PreAuthorize("hasAuthority('admin')")
+   // @PreAuthorize("hasAuthority('admin')")
         public ResponseEntity<?> deleteRoleById(@PathVariable("roleId") Long roleId){
             try {
                 //String token = authorizationHeader;

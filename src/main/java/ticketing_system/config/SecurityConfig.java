@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 //import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 //import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -18,7 +19,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 //import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
-@EnableMethodSecurity
+@EnableMethodSecurity()
 public class SecurityConfig {
 
     @Autowired
@@ -31,9 +32,8 @@ public class SecurityConfig {
 
         http
                 .authorizeRequests()
-                                .requestMatchers("/swagger-ui/index.html/api/v1/sign")
-                                .permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/api").hasAuthority("admin")
+                //.anyRequest().authenticated()
                                 //.anyRequest()
                                 //.authenticated()
                 .and()
@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .addFilterBefore(anonymousAuthenticationFilter(), AnonymousAuthenticationFilter.class)
                 .formLogin(formLogin ->
                         formLogin
-                                //  .loginPage("/swagger-ui/index.html") // Specify a custom login page if needed
+                                  //.loginPage("/login") // Specify a custom login page if needed
                                 .successHandler(successHandler)
                 )
                 .logout(logout ->

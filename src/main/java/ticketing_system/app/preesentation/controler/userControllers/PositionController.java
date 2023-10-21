@@ -83,7 +83,7 @@ public class PositionController {
 
     @Operation(description = "Get position by Id REST API")
     @GetMapping("/retrieveById/{positionId}")
-    @PreAuthorize("hasAuthority('admin')")
+    //@PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> retrievePositionById(@PathVariable("positionId") Long positionId){
         try {
             //String token = authorizationHeader;
