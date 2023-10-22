@@ -228,7 +228,9 @@ public class UserImpematation implements UserService  {
             System.out.println(updatedByUsers);
             user.setUpdatedBy(updatedByUsers.getId());
 
-            //PermissionByRole permission = new PermissionByRoleImpl();
+            // Hash the user's password before storing it in the database
+            String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+            user.setPassword(encodedPassword);
 
 
             return userRepository.save(user);
