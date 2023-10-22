@@ -97,11 +97,15 @@ public class Users implements UserDetails {
     @Column(name = "updated_on")
     private Timestamp updatedOn;
 
-    @Column(name = "email")
+    @Column(name = "username")
    // @ApiModelProperty(value = "User email")
     private String email;
 
-    public Users(Long id, String firstname, String surname, String email, String password, Positions positions, Role role, int createdBy, Timestamp createdOn, Long updatedBy, Timestamp updatedOn) {
+    @Column(name = "is_enabled")
+    private boolean isEnabled;
+
+
+    public Users(Long id,boolean isEnabled, String firstname, String surname, String email, String password, Positions positions, Role role, int createdBy, Timestamp createdOn, Long updatedBy, Timestamp updatedOn) {
         this.id = id;
         this.firstname = firstname;
         this.surname = surname;
@@ -113,6 +117,7 @@ public class Users implements UserDetails {
         this.updatedBy = updatedBy;
         this.updatedOn = updatedOn;
         this.email = email;
+        this.isEnabled = isEnabled;
     }
 
     public Users() {

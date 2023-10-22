@@ -1,21 +1,28 @@
 package ticketing_system.app.Business.implementation.userServiceImplementations;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
 import ticketing_system.app.Business.servises.userServices.UserService;
 import ticketing_system.app.percistance.Entities.userEntities.Positions;
 import ticketing_system.app.percistance.Entities.userEntities.Role;
 import ticketing_system.app.percistance.Entities.userEntities.Users;
+import ticketing_system.app.percistance.repositories.userRepositories.RoleRepository;
 import ticketing_system.app.percistance.repositories.userRepositories.UserRepository;
 import ticketing_system.app.preesentation.data.userDTOs.UserDTO;
 
+import javax.sql.DataSource;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,6 +74,9 @@ public class UserImpematation implements UserService  {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    RoleRepository roleRepository;
+
 
     @Autowired
     public UserImpematation(ModelMapper modelMapper,
@@ -94,9 +104,20 @@ public class UserImpematation implements UserService  {
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
+    @Autowired
+    private  JdbcUserDetailsManager userDetailsManager;
+
+    public UserImpematation(DataSource dataSource) {
+        this.userDetailsManager = new JdbcUserDetailsManager(dataSource);
+    }
+
+    public Collection<?> getAuthoritiesForUser(String username) {
+        UserDetails userDetails = userDetailsManager.loadUserByUsername(username);
+        return userDetails.getAuthorities();
+    }
 
     @Override
-    public Users createUser(String userEmailCreated, String roleName, String positionName,String token, UserDTO userDTO) {
+    public Users createUser(String userEmailCreated, String roleName, String positionName, UserDTO userDTO) {
 
         if (userDTO.getFirstName().isBlank() || userDTO.getFirstName() == null) {
             throw new IllegalArgumentException("Users first name can neither be null nor blank");
@@ -129,6 +150,9 @@ public class UserImpematation implements UserService  {
         System.out.println(createdByUsers);
        user.setCreatedBy(createdByUsers.getCreatedBy());
 
+       //enable
+        user.setEnabled(true);
+
         // Hash the user's password before storing it in the database
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
@@ -137,38 +161,23 @@ public class UserImpematation implements UserService  {
     if (userInDb !=null && userInDb.equals(user)){
         throw new IllegalArgumentException("User exist");
     }
-
-
-
-    if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
-        Users savedUsers = this.userRepository.save(user);
-        return savedUsers;
-    }
-    throw new IllegalArgumentException("Only admins can create a user");
+        return userRepository.save(user);
     }
 
     @Override
-    public List<Users> retrieveUsers(String token) {
+    public List<Users> retrieveUsers() {
         //PermissionByRole permission = new PermissionByRoleImpl();
-        System.out.println(tokenProvider.loggedInUserRole(token));
-        if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
             return userRepository.findAll();
 
-        }
-        throw new IllegalArgumentException("Only admins can create a user");
-
     }
 
     @Override
-    public Users retrieveUserById(Long userId,String token) {
+    public Users retrieveUserById(Long userId) {
         if (userRepository.existsById(userId)) {
-            if(tokenProvider.loggedInUserRole(token).equalsIgnoreCase("user")) {
-                throw new IllegalArgumentException("User cannot retrieve users");
-            }
+
             return userRepository.findById(userId).get();
         }
-        throw new IllegalArgumentException("Role not found");
-
+    return null;
     }
 
     @Override
@@ -178,10 +187,23 @@ public class UserImpematation implements UserService  {
             System.out.println(users);
             return users;
     }
+    @Override
+    @Transactional
+    public Users updateUserRole(String email, String newRoleName) {
+        Users user = userRepository.findByEmail(email);
+        if (user != null) {
+            Role userNewRole = roleRepository.findRoleByRoleName(newRoleName);
+            user.setRole(userNewRole);
+           return userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("no such user");
+        }
+        // return userRepository.updateRoleByEmail(email, newRoleName);
+    }
 
     @Override
-    public Users updateUser(Long userId,String userUpdatingEmail,String roleName,String positionName, String token,UserDTO userDTO) {
-        if (userRepository.existsById(userId)){
+    public Users updateUser(Long userId,String userUpdatingEmail,String roleName,String positionName,UserDTO userDTO) {
+        if (userRepository.existsById(userId)) {
 
             System.out.println(userId);
 
@@ -192,6 +214,8 @@ public class UserImpematation implements UserService  {
             //set updated on
             user.setUpdatedOn(currentTimestampFormatted);
 
+            //set enable
+            user.setEnabled(true);
             //set position
             Positions userPosition = positionService.retrievePositionByName(positionName);
             user.setPositions(userPosition);
@@ -205,28 +229,22 @@ public class UserImpematation implements UserService  {
             user.setUpdatedBy(updatedByUsers.getId());
 
             //PermissionByRole permission = new PermissionByRoleImpl();
-            if(!tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
-                throw new IllegalArgumentException("Only admin can update a user");
-            }
+
+
             return userRepository.save(user);
-        }else {
-            throw new IllegalArgumentException("Users not found");
+
         }
-
+        return null;
     }
-
     @Override
-    public boolean deleteUserById(Long userId,String token) {
+    public boolean deleteUserById(Long userId) {
         if (userRepository.existsById(userId)){
-           // PermissionByRole permission = new PermissionByRoleImpl();
-            if(!tokenProvider.loggedInUserRole(token).equalsIgnoreCase("admin")) {
-                throw new IllegalArgumentException("Only admin can delete a user");
-            }
+
             userRepository.deleteById(userId);
             return true;
-        }
-        throw new IllegalArgumentException("Users not found");
 
+    }
+        return false;
     }
 
     @Override
@@ -243,5 +261,58 @@ public class UserImpematation implements UserService  {
         // Verify a password provided by a user against the stored password hash
         return bCryptPasswordEncoder.matches(inputPassword, storedPassword);
     }
+
+
+    @Override
+    public Users createUserIn(String roleName, String positionName,UserDTO userDTO) {
+
+        if (userDTO.getFirstName().isBlank() || userDTO.getFirstName() == null) {
+            throw new IllegalArgumentException("Users first name can neither be null nor blank");
+        }
+        if (userDTO.getSurname().isBlank() || userDTO.getSurname() == null) {
+            throw new IllegalArgumentException("Users Surname field cannot be null nor blank");
+        }
+        if (userDTO.getEmail().isBlank() || userDTO.getEmail() == null) {
+            throw new IllegalArgumentException("Item description can neither be null nor blank");
+        }
+
+        if (userDTO == null) {
+            throw new IllegalArgumentException("Users cannot be null");
+        }
+        String creatorEmail = userDTO.getEmail();
+
+        Users user = convertToUser(userDTO);
+
+        //set created on
+        user.setCreatedOn(currentTimestampFormatted);
+
+        //set position
+        Positions userPosition = positionService.retrievePositionByName(positionName);
+        user.setPositions(userPosition);
+        //set role
+        Role userRole = roleService.retrieveRoleByName(roleName);
+        user.setRole(userRole);
+
+        //set created by
+        Users createdByUsers = retrieveUserByEmail(creatorEmail);
+        System.out.println(createdByUsers);
+        user.setCreatedBy(0);
+
+        //set enabled
+        user.setEnabled(true);
+
+        // Hash the user's password before storing it in the database
+        String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+
+        Users userInDb = userRepository.findByEmail(user.getEmail());
+        if (userInDb != null && userInDb.equals(user)) {
+            throw new IllegalArgumentException("User exist");
+        }
+
+        Users savedUsers = this.userRepository.save(user);
+        return savedUsers;
+    }
+
 
 }
