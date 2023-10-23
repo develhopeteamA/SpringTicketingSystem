@@ -2,6 +2,7 @@ package ticketing_system.app.Business.servises.TicketServices.implementation.Tic
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +18,8 @@ import ticketing_system.app.percistance.Enums.TicketPriority;
 import ticketing_system.app.percistance.Enums.TicketStatus;
 import ticketing_system.app.percistance.repositories.TicketRepositories.TicketsRepository;
 import ticketing_system.app.percistance.repositories.userRepositories.UserRepository;
+import ticketing_system.app.preesentation.controler.TicketControllers.TicketController;
+import ticketing_system.app.preesentation.controler.userControllers.UserController;
 import ticketing_system.app.preesentation.data.TicketData.TaskDTO;
 import ticketing_system.app.preesentation.data.TicketData.TicketAgentDTO;
 import ticketing_system.app.preesentation.data.TicketData.TicketDTO;
@@ -41,7 +44,10 @@ public class TicketServiceImpl implements TicketService {
     private final TaskService taskService;
     private final TicketsRepository ticketsRepository;
     private final TicketMapper ticketMapper;
+
+    @Autowired
     private UserRepository userRepository;
+
 
     public List<Tickets> getOpenTickets(){
 
@@ -127,18 +133,17 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketNormalDTO updateTicketById(final long ticketId, @Validated final TicketDTO ticketDTO) {
 
-        Tickets ticketToSave = ticketMapper.mapToTicket(ticketDTO);
-
         /*check if the ticket exists*/
         ticketsRepository.findById(ticketId).ifPresentOrElse(
                 ticket -> {
+                    Tickets ticketToSave = ticketMapper.mapToTicket(ticketDTO);
                     ticketToSave.setTicketId(ticket.getTicketId());
                     ticketsRepository.save(ticketToSave);
                 },
                 taskException::ticketNotFound
         );
 
-        return ticketMapper.mapToNormalDTO(ticketToSave);
+        return ticketMapper.mapToNormalDTO(getTicketByTicketId(ticketId));
     }
 
     @Override
@@ -209,44 +214,44 @@ public class TicketServiceImpl implements TicketService {
         ticketsRepository.findById(ticketId).ifPresentOrElse(
                 ticket -> {
                     Users agentToBeAssigned = userRepository.findById(userId).get();
-                    ticket.setAgentAssigned(agentToBeAssigned);
-                    ticketToSave.set(ticketsRepository.save(ticket));
+                    if(agentToBeAssigned!=null) {
+                        ticket.setAgentAssigned(agentToBeAssigned);
+                        ticketsRepository.save(ticket);
+//                        userController.updateUserRole(agentToBeAssigned.getEmail(),
+//                                "agent");
+                    }
                 },
                 taskException::ticketNotFound
         );
 
-        return ticketMapper.mapToAgentDTO(ticketToSave.get());
+        return ticketMapper.mapToAgentDTO(getTicketByTicketId(ticketId));
     }
 
     @Override
     public TicketNormalDTO updateTicketStatus(Long ticketId, TicketStatus ticketStatus) {
-         AtomicReference<Tickets> ticketToSave = new AtomicReference<>();
-
         /*check if the ticket exists*/
         ticketsRepository.findById(ticketId).ifPresentOrElse(
                 ticket -> {
                     ticket.setStatus(ticketStatus);
-                    ticketToSave.set(ticketsRepository.save(ticket));
+                    ticketsRepository.save(ticket);
                 },
                 taskException::ticketNotFound
         );
 
-        return ticketMapper.mapToNormalDTO(ticketToSave.get());
+        return ticketMapper.mapToNormalDTO(getTicketByTicketId(ticketId));
     }
 
     @Override
     public TicketNormalDTO updateTicketPriorityLevel(Long ticketId, TicketPriority ticketPriority) {
-         AtomicReference<Tickets> ticketToSave = new AtomicReference<>();
-
         /*check if the ticket exists*/
         ticketsRepository.findById(ticketId).ifPresentOrElse(
                 ticket -> {
                     ticket.setPriority(ticketPriority);
-                    ticketToSave.set(ticketsRepository.save(ticket));
+                    ticketsRepository.save(ticket);
                 },
                 taskException::ticketNotFound
         );
 
-        return ticketMapper.mapToNormalDTO(ticketToSave.get());
+        return ticketMapper.mapToNormalDTO(getTicketByTicketId(ticketId));
     }
 }
