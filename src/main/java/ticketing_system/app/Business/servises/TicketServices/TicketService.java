@@ -29,7 +29,7 @@ public interface TicketService {
     void completeTaskOfTicket(long ticketId, long taskId);
     TicketAgentDTO assignTicketToAgent(Long ticketId, Long userId);
 
-    TicketDTO updateTicketStatus(Long ticketId, TicketStatus ticketStatus);
+    TicketNormalDTO updateTicketStatus(Long ticketId, TicketStatus ticketStatus);
 
-    TicketDTO updateTicketPriorityLevel(Long ticketId, TicketPriority ticketPriority);
+    TicketNormalDTO updateTicketPriorityLevel(Long ticketId, TicketPriority ticketPriority);
 }
