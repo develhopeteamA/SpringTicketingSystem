@@ -196,12 +196,12 @@ public class TicketController {
     }
     @PutMapping(value = "/update-status")
     @Operation(summary = "update ticket status", description = "Retrieve and update ticket status by ticket id")
-    public ResponseEntity<TicketDTO> updateTicketStatus(@RequestParam(value = "ticketId") Long ticketId, @RequestParam(value = "ticketStatus") String ticketStatus){
+    public ResponseEntity<TicketNormalDTO> updateTicketStatus(@RequestParam(value = "ticketId") Long ticketId, @RequestParam(value = "ticketStatus") String ticketStatus){
         return ResponseEntity.ok(ticketService.updateTicketStatus(ticketId, TicketStatus.valueOf(ticketStatus))) ;
     }
     @PutMapping(value = "/update-priority-level")
     @Operation(summary = "update ticket priority", description= "Retrieve and update ticket priority")
-    public ResponseEntity<TicketDTO> updateTicketPriorityLevel(@RequestParam(value = "ticketId") Long ticketId, @RequestParam(value = "ticketPriorityLevel") String ticketPriorityLevel){
+    public ResponseEntity<TicketNormalDTO> updateTicketPriorityLevel(@RequestParam(value = "ticketId") Long ticketId, @RequestParam(value = "ticketPriorityLevel") String ticketPriorityLevel){
         return ResponseEntity.ok(ticketService.updateTicketPriorityLevel(ticketId, TicketPriority.valueOf(ticketPriorityLevel))) ;
     }
 
