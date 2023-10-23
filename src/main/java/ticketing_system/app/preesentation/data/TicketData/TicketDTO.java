@@ -16,6 +16,8 @@ public record TicketDTO(
         String description,
         @SchemaProperty(name = "tag")
         String tag,
+        @SchemaProperty(name = "priority" )
+        String priority,
         @SchemaProperty(name = "deadline")
         String deadline
 ) implements DTOType{

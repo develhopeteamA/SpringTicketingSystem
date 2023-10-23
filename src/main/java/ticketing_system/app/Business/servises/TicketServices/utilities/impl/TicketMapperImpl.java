@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ticketing_system.app.Business.servises.TicketServices.utilities.TicketMapper;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tickets;
 import ticketing_system.app.percistance.Enums.Tags;
+import ticketing_system.app.percistance.Enums.TicketPriority;
 import ticketing_system.app.preesentation.data.TicketData.TicketAgentDTO;
 import ticketing_system.app.preesentation.data.TicketData.TicketDTO;
 import ticketing_system.app.preesentation.data.TicketData.TicketNormalDTO;
@@ -36,6 +37,7 @@ public class TicketMapperImpl implements TicketMapper {
         map.setTicketName(ticketDTO.ticketName());
         map.setDescription(ticketDTO.description());
         map.setTag(Tags.valueOf(ticketDTO.tag()));
+        map.setPriority(TicketPriority.valueOf(ticketDTO.priority()));
         map.setDeadline(LocalDate.parse(ticketDTO.deadline(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         return map;
     }
@@ -45,7 +47,7 @@ public class TicketMapperImpl implements TicketMapper {
     @Override
     public TicketDTO mapToDTO(Tickets tickets) {
 
-        return new TicketDTO(tickets.getTicketName(),tickets.getDescription(),tickets.getTag().toString(),tickets.getDeadline().toString());
+        return new TicketDTO(tickets.getTicketName(),tickets.getDescription(),tickets.getTag().toString(), tickets.getPriority().toString(),tickets.getDeadline().toString());
     }
 
     /**
@@ -53,11 +55,7 @@ public class TicketMapperImpl implements TicketMapper {
     @Override
     public TicketNormalDTO mapToNormalDTO(Tickets tickets) {
 
-        TicketNormalDTO map = new TicketNormalDTO(tickets.getTicketName(),tickets.getDescription(),tickets.getTag().toString(),tickets.getStatus().toString(),tickets.getCreatedOn().toString());
-
-        return map;
-
-
+        return new TicketNormalDTO(tickets.getTicketName(),tickets.getDescription(),tickets.getTag().toString(),tickets.getStatus().toString(),tickets.getPriority().toString(), tickets.getCreatedOn().toString());
     }
 
     /**

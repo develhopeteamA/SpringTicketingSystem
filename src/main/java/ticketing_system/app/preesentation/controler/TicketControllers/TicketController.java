@@ -8,6 +8,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +17,9 @@ import ticketing_system.app.Business.servises.TicketServices.TicketService;
 import ticketing_system.app.Business.servises.TicketServices.utilities.TaskMapper;
 import ticketing_system.app.Business.servises.TicketServices.utilities.TicketMapper;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tickets;
-import ticketing_system.app.preesentation.data.TicketData.CreatedDTO;
-import ticketing_system.app.preesentation.data.TicketData.DTOType;
-import ticketing_system.app.preesentation.data.TicketData.TaskDTO;
-import ticketing_system.app.preesentation.data.TicketData.TicketDTO;
+import ticketing_system.app.percistance.Enums.TicketPriority;
+import ticketing_system.app.percistance.Enums.TicketStatus;
+import ticketing_system.app.preesentation.data.TicketData.*;
 
 
 import java.util.List;
@@ -170,4 +171,38 @@ public class TicketController {
         /*create response*/
         return ResponseEntity.status(201).body(response);
     }
+
+    @PutMapping(value = "/update")
+    @Operation(summary = "update ticket", description = "Update a ticket by ID")
+    public ResponseEntity<TicketNormalDTO> updateTicketById(@RequestParam(value = "ticket_id")Long ticketId, @RequestBody TicketDTO ticketDTO){
+        return ResponseEntity.ok(ticketService.updateTicketById(ticketId, ticketDTO));
+    }
+
+    @DeleteMapping(value = "/delete")
+    @Operation(summary = "delete ticket", description = "Delete a ticket by ID")
+    public ResponseEntity<EntityModel<CreatedDTO>> deleteTicketById(@RequestParam(value = "ticket_id")Long ticketId){
+        ticketService.deleteTicketById(ticketId);
+
+        EntityModel<CreatedDTO> response = EntityModel.of(new CreatedDTO("Ticket successfully deleted"));
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(value = "/assign")
+    @Operation(summary = "assign ticket", description = "Assign an agent to a ticket")
+    public ResponseEntity<TicketAgentDTO> assignTicketToAgent(@RequestParam(value = "ticket_id") Long ticketId,
+                                                              @RequestParam(value = "user_id") Long userId){
+        return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.assignTicketToAgent(ticketId, userId));
+    }
+    @PutMapping(value = "/update-status")
+    @Operation(summary = "update ticket status", description = "Retrieve and update ticket status by ticket id")
+    public ResponseEntity<TicketDTO> updateTicketStatus(@RequestParam(value = "ticketId") Long ticketId, @RequestParam(value = "ticketStatus") String ticketStatus){
+        return ResponseEntity.ok(ticketService.updateTicketStatus(ticketId, TicketStatus.valueOf(ticketStatus))) ;
+    }
+    @PutMapping(value = "/update-priority-level")
+    @Operation(summary = "update ticket priority", description= "Retrieve and update ticket priority")
+    public ResponseEntity<TicketDTO> updateTicketPriorityLevel(@RequestParam(value = "ticketId") Long ticketId, @RequestParam(value = "ticketPriorityLevel") String ticketPriorityLevel){
+        return ResponseEntity.ok(ticketService.updateTicketPriorityLevel(ticketId, TicketPriority.valueOf(ticketPriorityLevel))) ;
+    }
+
 }
