@@ -21,7 +21,7 @@ import java.util.List;
 public class Tickets implements DTOType {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
     private long ticketId;
     @Column(nullable = false)
@@ -33,7 +33,7 @@ public class Tickets implements DTOType {
     @OneToMany(cascade = {CascadeType.ALL})
     private List<Tasks> tasks;
 
-    @Column(name = "deadline_date")
+    @Column(nullable = false)
     private LocalDate deadline;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

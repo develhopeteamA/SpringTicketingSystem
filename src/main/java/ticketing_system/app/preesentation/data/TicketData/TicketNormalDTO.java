@@ -18,6 +18,8 @@ public record TicketNormalDTO(
         String tag,
         @SchemaProperty(name = "status")
         String status,
+        @SchemaProperty(name = "priority" )
+        String priority,
         @SchemaProperty(name = "created on")
         String createdOn
 ) implements DTOType{

@@ -12,10 +12,13 @@ import ticketing_system.app.exceptions.TaskExceptionService;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tasks;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tickets;
 import ticketing_system.app.percistance.Enums.Tags;
+import ticketing_system.app.percistance.Enums.TicketPriority;
 import ticketing_system.app.percistance.Enums.TicketStatus;
 import ticketing_system.app.percistance.repositories.TicketRepositories.TicketsRepository;
 import ticketing_system.app.preesentation.data.TicketData.TaskDTO;
+import ticketing_system.app.preesentation.data.TicketData.TicketAgentDTO;
 import ticketing_system.app.preesentation.data.TicketData.TicketDTO;
+import ticketing_system.app.preesentation.data.TicketData.TicketNormalDTO;
 ;
 
 import java.time.LocalDate;
@@ -76,7 +79,10 @@ public class TicketServiceImpl implements TicketService {
         ticket.setDeadline(deadline);
 
         ticket.setTag(Tags.valueOf(ticketDTO.tag()));
+
         ticket.setTicketName(ticketDTO.ticketName());
+
+        ticket.setPriority(TicketPriority.valueOf(ticketDTO.priority()));
 
         ticket.setDescription(ticketDTO.description());
         /*persist the ticket*/
@@ -116,17 +122,20 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void updateTicketById(final long ticketId,@Validated final TicketDTO ticketDTO) {
+    public TicketNormalDTO updateTicketById(final long ticketId, @Validated final TicketDTO ticketDTO) {
+
+        Tickets ticketToSave = ticketMapper.mapToTicket(ticketDTO);
 
         /*check if the ticket exists*/
         ticketsRepository.findById(ticketId).ifPresentOrElse(
                 ticket -> {
-                    Tickets ticketToSave = ticketMapper.mapToTicket(ticketDTO);
                     ticketToSave.setTicketId(ticket.getTicketId());
                     ticketsRepository.save(ticketToSave);
                 },
                 taskException::ticketNotFound
         );
+
+        return ticketMapper.mapToNormalDTO(ticketToSave);
     }
 
     @Override
@@ -187,5 +196,20 @@ public class TicketServiceImpl implements TicketService {
                 },
                 taskException::ticketNotFound
         );
+    }
+
+    @Override
+    public TicketAgentDTO assignTicketToAgent(Long ticketId, Long userId) {
+        return null;
+    }
+
+    @Override
+    public TicketDTO updateTicketStatus(Long ticketId, TicketStatus ticketStatus) {
+        return null;
+    }
+
+    @Override
+    public TicketDTO updateTicketPriorityLevel(Long ticketId, TicketPriority ticketPriority) {
+        return null;
     }
 }
