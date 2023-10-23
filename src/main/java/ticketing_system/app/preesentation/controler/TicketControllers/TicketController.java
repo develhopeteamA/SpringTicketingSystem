@@ -189,7 +189,7 @@ public class TicketController {
     }
 
     @PutMapping(value = "/assign")
-    @Operation(summary = "assign ticket", description = "Assign an agent to a ticket")
+    @Operation(summary = "assign ticket", description = "Assign a ticket to an agent")
     public ResponseEntity<TicketAgentDTO> assignTicketToAgent(@RequestParam(value = "ticket_id") Long ticketId,
                                                               @RequestParam(value = "user_id") Long userId){
         return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.assignTicketToAgent(ticketId, userId));
