@@ -150,8 +150,9 @@ public class TicketController {
         return ResponseEntity.status(201).body(response);
     }
 
-    @PostMapping(value = {"task/{id}"})
-    public ResponseEntity<EntityModel<DTOType>> addTaskToTicket(@PathVariable("id") final long ticketId ,
+    @PostMapping(value = {"task/{ticketId}"})
+    @Operation(summary = "Add task", description = "Add a task to a ticket")
+    public ResponseEntity<EntityModel<DTOType>> addTaskToTicket(@PathVariable("ticketId") final long ticketId ,
                                                                 @RequestBody TaskDTO task){
         log.warn("passed {}", task);
 
@@ -166,7 +167,7 @@ public class TicketController {
         /*add links*/
         response.add(ticketLink);
 
-        log.warn("created {}", task);
+        log.warn("creed {}at", task);
 
         /*create response*/
         return ResponseEntity.status(201).body(response);
