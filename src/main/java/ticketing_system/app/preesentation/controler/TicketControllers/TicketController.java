@@ -191,9 +191,13 @@ public class TicketController {
 
     @PutMapping(value = "/assign")
     @Operation(summary = "assign ticket", description = "Assign a ticket to an agent")
-    public ResponseEntity<TicketAgentDTO> assignTicketToAgent(@RequestParam(value = "ticket_id") Long ticketId,
+    public ResponseEntity<?> assignTicketToAgent(@RequestParam(value = "ticket_id") Long ticketId,
                                                               @RequestParam(value = "user_id") Long userId){
-        return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.assignTicketToAgent(ticketId, userId));
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.assignTicketToAgent(ticketId, userId));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     @PutMapping(value = "/update-status")
     @Operation(summary = "update ticket status", description = "Retrieve and update ticket status by ticket id")

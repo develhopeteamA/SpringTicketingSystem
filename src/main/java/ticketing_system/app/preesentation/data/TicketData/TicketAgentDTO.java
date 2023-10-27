@@ -22,6 +22,8 @@ public record TicketAgentDTO(
         String status,
         @SchemaProperty(name = "priority" )
         String priority,
+        @SchemaProperty(name = "agentAssigned" )
+        String agentAssigned,
         @SchemaProperty(name = "updatedOn")
         String updatedOn
 ) implements DTOType{
