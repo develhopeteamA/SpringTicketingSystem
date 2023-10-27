@@ -32,8 +32,10 @@ public class Tickets implements DTOType {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Tags tag;
+
     @OneToMany(cascade = {CascadeType.ALL})
     private List<Tasks> tasks;
+
     @Column(nullable = false)
     private LocalDate deadline;
     @Enumerated(EnumType.STRING)

@@ -144,43 +144,26 @@ public class TicketController {
      */
     @PostMapping
     @Operation(tags = {"Ticket Api"},summary = "create ticket",description = "create a ticket" )
-    public ResponseEntity<EntityModel<CreatedDTO>> createTicket(@Validated @RequestBody final TicketDTO ticketDTO){
+    public ResponseEntity<?> createTicket(@Validated @RequestBody final TicketDTO ticketDTO){
 
-        /*create the ticket*/
-        Tickets ticket = ticketService.createTicket(ticketDTO);
+//        /*create the ticket*/
+//        Tickets ticket = ticketService.createTicket(ticketDTO);
+//
+//        /*create the response*/
+//        EntityModel<CreatedDTO> response = EntityModel.of(new CreatedDTO("successfully Created"),
+//                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TicketController.class).getTicketById(
+//                        "USER", ticket.getTicketId()
+//                )).withRel("the ticket")
+//        );
 
-        /*create the response*/
-        EntityModel<CreatedDTO> response = EntityModel.of(new CreatedDTO("successfully Created"),
-                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TicketController.class).getTicketById(
-                        "USER", ticket.getTicketId()
-                )).withRel("the ticket")
-        );
+        try{
+            return ResponseEntity.status(201).body(ticketService.createTicket(ticketDTO));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e);
+        }
 
-        return ResponseEntity.status(201).body(response);
     }
 
-    @PostMapping(value = {"task/{ticketId}"})
-    @Operation(summary = "Add task", description = "Add a task to a ticket")
-    public ResponseEntity<EntityModel<DTOType>> addTaskToTicket(@PathVariable("ticketId") final long ticketId ,
-                                                                @RequestBody TaskDTO task){
-        log.warn("passed {}", task);
-
-        /*create the task*/
-        ticketService.addTaskToTicket(ticketId, task);
-        /*create the response*/
-        EntityModel<DTOType> response = EntityModel.of(new CreatedDTO("task added successfully. click the link to see"));
-        /*create links*/
-        Link ticketLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TicketController.class).
-                getTicketById("USER", ticketId)).withRel("ticket");
-
-        /*add links*/
-        response.add(ticketLink);
-
-        log.warn("creed {}at", task);
-
-        /*create response*/
-        return ResponseEntity.status(201).body(response);
-    }
 
     @PutMapping(value = "/update")
     @Operation(summary = "update ticket", description = "Update a ticket by ID")

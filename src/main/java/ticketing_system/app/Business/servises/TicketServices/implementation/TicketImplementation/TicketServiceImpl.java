@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import ticketing_system.app.Business.implementation.userServiceImplementations.UserImpematation;
 import ticketing_system.app.Business.servises.TicketServices.TaskService;
 import ticketing_system.app.Business.servises.TicketServices.TicketService;
 import ticketing_system.app.Business.servises.TicketServices.utilities.TicketMapper;
@@ -14,18 +13,12 @@ import ticketing_system.app.exceptions.TaskExceptionService;
 import ticketing_system.app.exceptions.TicketNotFoundException;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tasks;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tickets;
-import ticketing_system.app.percistance.Entities.userEntities.Users;
 import ticketing_system.app.percistance.Enums.Tags;
 import ticketing_system.app.percistance.Enums.TicketPriority;
 import ticketing_system.app.percistance.Enums.TicketStatus;
 import ticketing_system.app.percistance.repositories.TicketRepositories.TicketsRepository;
 import ticketing_system.app.percistance.repositories.userRepositories.UserRepository;
-import ticketing_system.app.preesentation.controler.TicketControllers.TicketController;
-import ticketing_system.app.preesentation.controler.userControllers.UserController;
-import ticketing_system.app.preesentation.data.TicketData.TaskDTO;
-import ticketing_system.app.preesentation.data.TicketData.TicketAgentDTO;
-import ticketing_system.app.preesentation.data.TicketData.TicketDTO;
-import ticketing_system.app.preesentation.data.TicketData.TicketNormalDTO;
+import ticketing_system.app.preesentation.data.TicketData.*;
 ;
 
 import java.time.LocalDate;
@@ -80,7 +73,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Tickets createTicket(@Validated TicketDTO ticketDTO) {
+    public TicketDTO createTicket(@Validated TicketDTO ticketDTO) {
 
         /*map the ticket to DTO*/
         Tickets ticket = ticketMapper.mapToTicket(ticketDTO);
@@ -97,7 +90,7 @@ public class TicketServiceImpl implements TicketService {
 
         ticket.setDescription(ticketDTO.description());
         /*persist the ticket*/
-        return ticketsRepository.save(ticket);
+        return ticketMapper.mapToDTO(ticketsRepository.save(ticket));
     }
 
     @Override
@@ -140,7 +133,11 @@ public class TicketServiceImpl implements TicketService {
                 ticket -> {
                     Tickets ticketToSave = ticketMapper.mapToTicket(ticketDTO);
                     ticketToSave.setTicketId(ticket.getTicketId());
+                    ticketToSave.setAgentAssigned(ticket.getAgentAssigned());
+                    ticketToSave.setTasks(ticket.getTasks());
+                    ticketToSave.setStatus(ticket.getStatus());
                     ticketsRepository.save(ticketToSave);
+
                 },
                 taskException::ticketNotFound
         );
@@ -159,33 +156,11 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void addTaskToTicket(final long ticketId,@Validated final TaskDTO taskDTO) {
-
-        log.warn("service entry {}", taskDTO);
-
-        /*check if ticket exists*/
-        ticketsRepository.findById(ticketId).ifPresentOrElse(
-                ticket -> {
-                    /*create the task*/
-                    Tasks task = taskService.createTaskGetTask(taskDTO);
-                    /*add the task to the ticket*/
-                    ticket.getTasks().add(task);
-                    /*update the ticket*/
-                    ticketsRepository.save(ticket);
-                },
-                taskException::ticketNotFound
-        );
-
-        log.warn("service pass {}", taskDTO);
-
-    }
-
-    @Override
     public void deleteTaskFromTicket(final long ticketId,final long taskId) {
 
         /*check if ticket exists*/
         ticketsRepository.findById(ticketId).ifPresentOrElse(
-                ticket -> taskService.deleteTaskById(taskId),
+                ticket -> taskService.deleteTaskById(taskId, ticketId),
                 taskException::ticketNotFound
         );
     }
