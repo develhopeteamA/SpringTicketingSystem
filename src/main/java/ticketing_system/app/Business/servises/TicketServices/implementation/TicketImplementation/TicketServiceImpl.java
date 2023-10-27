@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import ticketing_system.app.Business.implementation.userServiceImplementations.UserImpematation;
 import ticketing_system.app.Business.servises.TicketServices.TaskService;
 import ticketing_system.app.Business.servises.TicketServices.TicketService;
 import ticketing_system.app.Business.servises.TicketServices.utilities.TicketMapper;
@@ -213,13 +214,25 @@ public class TicketServiceImpl implements TicketService {
         /*check if the ticket exists*/
         ticketsRepository.findById(ticketId).ifPresentOrElse(
                 ticket -> {
-                    Users agentToBeAssigned = userRepository.findById(userId).get();
-                    if(agentToBeAssigned!=null) {
-                        ticket.setAgentAssigned(agentToBeAssigned);
-                        ticketsRepository.save(ticket);
-//                        userController.updateUserRole(agentToBeAssigned.getEmail(),
-//                                "agent");
-                    }
+
+//                    Users agentToBeAssigned = userRepository.findById(userId).get();
+                    userRepository.findById(userId).ifPresentOrElse(
+                            users -> {
+                                //check if user role == agent/admin
+                                String agentRoleName = users.getRole().getRoleName().toLowerCase();
+                                log.info("Agent Role: " + agentRoleName);
+                                if (users != null && agentRoleName.equals("agent")) {
+                                    ticket.setAgentAssigned(users);
+                                    ticketsRepository.save(ticket);
+
+                                }
+                            },
+                            () -> {
+                                throw new RuntimeException("This user cannot be assigned a ticket. " +
+                                        "Check if the user exists and has the correct role");
+                            }
+                    );
+
                 },
                 taskException::ticketNotFound
         );

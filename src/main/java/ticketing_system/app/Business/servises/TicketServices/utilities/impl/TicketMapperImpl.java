@@ -63,6 +63,6 @@ public class TicketMapperImpl implements TicketMapper {
     @Override
     public TicketAgentDTO mapToAgentDTO(Tickets tickets) {
 
-        return new TicketAgentDTO(tickets.getTicketName(),tickets.getDescription(),tickets.getTag().toString(),tickets.getDeadline().toString(),tickets.getStatus().toString(),tickets.getPriority().toString(),tickets.getUpdatedOn().toString());
+        return new TicketAgentDTO(tickets.getTicketName(),tickets.getDescription(),tickets.getTag().toString(),tickets.getDeadline().toString(),tickets.getStatus().toString(),tickets.getPriority().toString(), tickets.getAgentAssigned().getFirstname(),tickets.getUpdatedOn().toString());
     }
 }
