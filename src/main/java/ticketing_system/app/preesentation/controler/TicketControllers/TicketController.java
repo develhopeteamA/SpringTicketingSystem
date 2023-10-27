@@ -79,55 +79,64 @@ public class TicketController {
 
     @GetMapping(value = {"byName/{name}"})
     @Operation(summary = "get ticket", description = "get ticket by name")
-    public ResponseEntity<List<? extends DTOType>> getTicketByName(@RequestHeader(name = "ROLE", defaultValue = "USER") String userRole ,
+    public ResponseEntity<?> getTicketByName(@RequestHeader(name = "ROLE", defaultValue = "USER") String userRole ,
                                                                    @PathVariable("name") String name){
 
         /*get ticket by name*/
         List<Tickets> ticketByName = ticketService.getTicketByName(name);
         /*declare a ticket*/
         List<? extends DTOType> tickets;
-        /*get DTO based on a role*/
-        switch (userRole){
-            case "USER" -> tickets = ticketByName.stream().map(ticketMapper::mapToNormalDTO).toList();
-            case "ADMIN" -> tickets = ticketByName;
-            case "AGENT" -> tickets = ticketByName.stream().map(ticketMapper::mapToAgentDTO).toList();
-            default -> tickets = null;
+        try {
+            /*get DTO based on a role*/
+            switch (userRole) {
+                case "USER" -> tickets = ticketByName.stream().map(ticketMapper::mapToNormalDTO).toList();
+                case "ADMIN" -> tickets = ticketByName;
+                case "AGENT" -> tickets = ticketByName.stream().map(ticketMapper::mapToAgentDTO).toList();
+                default -> tickets = null;
+            }
+
+            assert tickets != null;
+            /*create an entity model*/
+            //EntityModel<? extends List<? extends DTOType>> listEntityModel = EntityModel.of(tickets);
+
+            /*return the response*/
+            return ResponseEntity.ok(tickets);
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e);
         }
-
-        assert tickets != null;
-        /*create an entity model*/
-        //EntityModel<? extends List<? extends DTOType>> listEntityModel = EntityModel.of(tickets);
-
-        /*return the response*/
-        return ResponseEntity.ok(tickets);
 
     }
 
     @GetMapping(value = {"byId/{ticketId}"})
     @Operation(summary = "get ticket", description = "get a ticket by ID")
-    public ResponseEntity<EntityModel<DTOType>> getTicketById(@RequestHeader(name = "ROLE", defaultValue = "USER")
+    public ResponseEntity<?> getTicketById(@RequestHeader(name = "ROLE", defaultValue = "USER")
                                                               String userRole, @PathVariable("ticketId")
                                                               long ticketId){
 
-        /*get a ticket by the ID*/
-        Tickets ticketByTicketId = ticketService.getTicketByTicketId(ticketId);
-        DTOType ticketDTO;
-        /*get DTO based on the role*/
-        switch (userRole){
+        try{
+            /*get a ticket by the ID*/
+            Tickets ticketByTicketId = ticketService.getTicketByTicketId(ticketId);
+            DTOType ticketDTO;
+            /*get DTO based on the role*/
+            switch (userRole){
 
-            case "USER" -> ticketDTO = ticketByTicketId;
-            case "AGENT" -> ticketDTO = ticketByTicketId;
-            case "ADMIN" -> ticketDTO = ticketByTicketId;
-            default -> ticketDTO = null;
+                case "USER" -> ticketDTO = ticketByTicketId;
+                case "AGENT" -> ticketDTO = ticketByTicketId;
+                case "ADMIN" -> ticketDTO = ticketByTicketId;
+                default -> ticketDTO = null;
+            }
+            assert ticketDTO != null;
+            /*create an entity model*/
+            EntityModel<DTOType> dtoType = EntityModel.of(ticketByTicketId);
+            /*add a link*/
+
+
+            /*return the response*/
+            return ResponseEntity.ok(dtoType);
+
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e);
         }
-        assert ticketDTO != null;
-        /*create an entity model*/
-        EntityModel<DTOType> dtoType = EntityModel.of(ticketByTicketId);
-        /*add a link*/
-
-
-        /*return the response*/
-        return ResponseEntity.ok(dtoType);
     }
 
     /**
@@ -175,8 +184,12 @@ public class TicketController {
 
     @PutMapping(value = "/update")
     @Operation(summary = "update ticket", description = "Update a ticket by ID")
-    public ResponseEntity<TicketNormalDTO> updateTicketById(@RequestParam(value = "ticket_id")Long ticketId, @RequestBody TicketDTO ticketDTO){
-        return ResponseEntity.ok(ticketService.updateTicketById(ticketId, ticketDTO));
+    public ResponseEntity<?> updateTicketById(@RequestParam(value = "ticket_id")Long ticketId, @RequestBody TicketDTO ticketDTO){
+       try{
+           return ResponseEntity.ok(ticketService.updateTicketById(ticketId, ticketDTO));
+       } catch (Exception e){
+           return ResponseEntity.badRequest().body(e);
+       }
     }
 
     @DeleteMapping(value = "/delete")
@@ -201,13 +214,34 @@ public class TicketController {
     }
     @PutMapping(value = "/update-status")
     @Operation(summary = "update ticket status", description = "Retrieve and update ticket status by ticket id")
-    public ResponseEntity<TicketNormalDTO> updateTicketStatus(@RequestParam(value = "ticketId") Long ticketId, @RequestParam(value = "ticketStatus") String ticketStatus){
-        return ResponseEntity.ok(ticketService.updateTicketStatus(ticketId, TicketStatus.valueOf(ticketStatus))) ;
+    public ResponseEntity<?> updateTicketStatus(@RequestParam(value = "ticketId") Long ticketId, @RequestParam(value = "ticketStatus") String ticketStatus){
+        try {
+            return ResponseEntity.ok(ticketService.updateTicketStatus(ticketId, TicketStatus.valueOf(ticketStatus))) ;
+
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e);
+        }
     }
     @PutMapping(value = "/update-priority-level")
     @Operation(summary = "update ticket priority", description= "Retrieve and update ticket priority")
-    public ResponseEntity<TicketNormalDTO> updateTicketPriorityLevel(@RequestParam(value = "ticketId") Long ticketId, @RequestParam(value = "ticketPriorityLevel") String ticketPriorityLevel){
-        return ResponseEntity.ok(ticketService.updateTicketPriorityLevel(ticketId, TicketPriority.valueOf(ticketPriorityLevel))) ;
+    public ResponseEntity<?> updateTicketPriorityLevel(@RequestParam(value = "ticketId") Long ticketId, @RequestParam(value = "ticketPriorityLevel") String ticketPriorityLevel){
+        try{
+            return ResponseEntity.ok(ticketService.updateTicketPriorityLevel(ticketId, TicketPriority.valueOf(ticketPriorityLevel))) ;
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
+    @PutMapping(value = "/close")
+    @Operation(summary = "close ticket", description= "Admin can close ticket")
+    public ResponseEntity<?> closeTicket(@RequestParam(value = "ticketId") Long ticketId){
+        try {
+            ticketService.closeTicket(ticketId);
+            return ResponseEntity.ok("Ticket successfully closed!") ;
+
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

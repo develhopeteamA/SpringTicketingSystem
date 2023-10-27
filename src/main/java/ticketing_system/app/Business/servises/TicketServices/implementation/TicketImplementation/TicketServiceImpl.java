@@ -11,6 +11,7 @@ import ticketing_system.app.Business.servises.TicketServices.TaskService;
 import ticketing_system.app.Business.servises.TicketServices.TicketService;
 import ticketing_system.app.Business.servises.TicketServices.utilities.TicketMapper;
 import ticketing_system.app.exceptions.TaskExceptionService;
+import ticketing_system.app.exceptions.TicketNotFoundException;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tasks;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tickets;
 import ticketing_system.app.percistance.Entities.userEntities.Users;
@@ -266,5 +267,20 @@ public class TicketServiceImpl implements TicketService {
         );
 
         return ticketMapper.mapToNormalDTO(getTicketByTicketId(ticketId));
+    }
+
+    @Override
+    public void closeTicket(Long ticketId) {
+        /*check if the ticket exists*/
+        ticketsRepository.findById(ticketId).ifPresentOrElse(
+                ticket -> {
+                    ticket.setStatus(TicketStatus.CLOSED);
+                    ticketsRepository.save(ticket);
+                },
+                ()-> {
+                    throw new TicketNotFoundException("Ticket Not Found");
+                }
+        );
+
     }
 }

@@ -32,4 +32,6 @@ public interface TicketService {
     TicketNormalDTO updateTicketStatus(Long ticketId, TicketStatus ticketStatus);
 
     TicketNormalDTO updateTicketPriorityLevel(Long ticketId, TicketPriority ticketPriority);
+
+    void closeTicket(Long ticketId);
 }
