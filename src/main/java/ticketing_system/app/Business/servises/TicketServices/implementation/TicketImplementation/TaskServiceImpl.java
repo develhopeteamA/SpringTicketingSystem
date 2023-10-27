@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ticketing_system.app.Business.servises.TicketServices.TaskService;
 import ticketing_system.app.Business.servises.TicketServices.utilities.TaskMapper;
-import ticketing_system.app.Business.servises.TicketServices.utilities.TicketMapper;
 import ticketing_system.app.Business.servises.TicketServices.utilities.impl.TicketMapperImpl;
 import ticketing_system.app.exceptions.TaskNotFoundException;
 import ticketing_system.app.exceptions.TicketNotFoundException;
@@ -128,5 +127,14 @@ public class TaskServiceImpl implements TaskService {
         savedTask.setComplete(true);
         /*update the task*/
         return taskMapper.mapToPreDTO(tasksRepository.save(savedTask));
+    }
+
+    @Override
+    public TaskPresentationDTO getTaskById(Long taskId) {
+
+        return taskMapper.mapToPreDTO(
+                tasksRepository.findById(taskId).orElseThrow(
+                        ()-> new TaskNotFoundException("Task Not Found"))
+        );
     }
 }

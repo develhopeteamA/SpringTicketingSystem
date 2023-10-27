@@ -22,4 +22,6 @@ public interface TaskService {
     void deleteTaskById(long taskId, long ticketId);
 
     TaskPresentationDTO completeTaskById(Long taskId);
+
+    TaskPresentationDTO getTaskById(Long taskId);
 }

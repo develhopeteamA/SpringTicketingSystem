@@ -51,6 +51,18 @@ public class TaskController {
         /*create response*/
 
     }
+
+    @GetMapping(value = "/retrieve")
+    @Operation(summary = "get task", description = "Get a task by ID")
+    public ResponseEntity<?> getTaskById(@RequestParam(value = "taskId")Long taskId){
+        try{
+            return ResponseEntity.ok().body(taskService.getTaskById(taskId));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e);
+        }
+
+    }
+
     @PutMapping(value = "/update")
     @Operation(summary = "update task", description = "Update a task by ID")
     public ResponseEntity<?> updateTaskById(@RequestParam(value = "taskId")Long taskId, @RequestBody TaskDTO taskDTO){
