@@ -1,8 +1,11 @@
 package ticketing_system.app.Business.servises.TicketServices;
 
 
+import org.springframework.validation.annotation.Validated;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tasks;
 import ticketing_system.app.preesentation.data.TicketData.TaskDTO;
+import ticketing_system.app.preesentation.data.TicketData.TaskPresentationDTO;
+import ticketing_system.app.preesentation.data.TicketData.TicketFieldsDTO;
 
 /**
  * the task service.
@@ -10,9 +13,15 @@ import ticketing_system.app.preesentation.data.TicketData.TaskDTO;
 
 public interface TaskService {
 
-    Tasks createTaskGetTask(TaskDTO taskDTO);
+    Tasks createTask(@Validated TaskDTO taskDTO);
 
-    void updateTaskById(long taskId, TaskDTO taskDTO);
+    TicketFieldsDTO addTaskToTicket(long ticketId, TaskDTO taskDTO);
 
-    void deleteTaskById(long taskId);
+    TaskDTO updateTaskById(long taskId, TaskDTO taskDTO);
+
+    void deleteTaskById(long taskId, long ticketId);
+
+    TaskPresentationDTO completeTaskById(Long taskId);
+
+    TaskPresentationDTO getTaskById(Long taskId);
 }

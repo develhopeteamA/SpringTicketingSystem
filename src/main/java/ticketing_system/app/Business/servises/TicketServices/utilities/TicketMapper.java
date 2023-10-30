@@ -2,6 +2,7 @@ package ticketing_system.app.Business.servises.TicketServices.utilities;
 
 import ticketing_system.app.percistance.Entities.TicketEntities.Tickets;
 import ticketing_system.app.preesentation.data.TicketData.TicketAgentDTO;
+import ticketing_system.app.preesentation.data.TicketData.TicketFieldsDTO;
 import ticketing_system.app.preesentation.data.TicketData.TicketDTO;
 import ticketing_system.app.preesentation.data.TicketData.TicketNormalDTO;
 
@@ -15,4 +16,6 @@ public interface TicketMapper {
     TicketDTO mapToDTO(Tickets tickets);
     TicketNormalDTO mapToNormalDTO(Tickets tickets);
     TicketAgentDTO mapToAgentDTO(Tickets tickets);
+
+    TicketFieldsDTO mapToAllParamsDTO(Tickets ticket);
 }

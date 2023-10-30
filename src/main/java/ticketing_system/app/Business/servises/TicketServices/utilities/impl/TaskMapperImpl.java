@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import ticketing_system.app.Business.servises.TicketServices.utilities.TaskMapper;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tasks;
+import ticketing_system.app.percistance.Entities.TicketEntities.Tickets;
 import ticketing_system.app.preesentation.data.TicketData.TaskDTO;
 import ticketing_system.app.preesentation.data.TicketData.TaskPresentationDTO;
 
@@ -23,7 +24,6 @@ public class TaskMapperImpl implements TaskMapper {
      * map {@link TaskDTO} to {@link Tasks}*/
     @Override
     public Tasks mapToTask(TaskDTO taskDTO) {
-
         /*map TaskDTO to Tasks*/
         return mapper.map(taskDTO, Tasks.class);
     }
@@ -32,7 +32,6 @@ public class TaskMapperImpl implements TaskMapper {
      * map {@link Tasks} to {@link TaskDTO}*/
     @Override
     public TaskDTO mapToDTO(Tasks tasks) {
-
         return mapper.map(tasks, TaskDTO.class);
     }
 

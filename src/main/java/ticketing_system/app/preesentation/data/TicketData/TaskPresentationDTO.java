@@ -2,6 +2,7 @@ package ticketing_system.app.preesentation.data.TicketData;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.SchemaProperty;
+import lombok.Data;
 import org.hibernate.annotations.Type;
 
 /**
@@ -9,11 +10,13 @@ import org.hibernate.annotations.Type;
  * @author kamar baraka.*/
 
 @Schema(title = "Task Representation", name = "TaskPresentationDTO",description = "a representation of a task")
-public record TaskPresentationDTO(
-
+@Data
+public class TaskPresentationDTO implements DTOType{
         @SchemaProperty(name = "description")
-        String description,
+        String description;
         @SchemaProperty(name = "complete", schema = @Schema(implementation = Boolean.class))
-        boolean complete
-) implements DTOType{
+        boolean complete;
+
+        public TaskPresentationDTO(){}
 }
+

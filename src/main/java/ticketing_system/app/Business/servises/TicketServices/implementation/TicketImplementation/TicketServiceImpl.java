@@ -2,6 +2,7 @@ package ticketing_system.app.Business.servises.TicketServices.implementation.Tic
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -9,19 +10,21 @@ import ticketing_system.app.Business.servises.TicketServices.TaskService;
 import ticketing_system.app.Business.servises.TicketServices.TicketService;
 import ticketing_system.app.Business.servises.TicketServices.utilities.TicketMapper;
 import ticketing_system.app.exceptions.TaskExceptionService;
+import ticketing_system.app.exceptions.TicketNotFoundException;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tasks;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tickets;
 import ticketing_system.app.percistance.Enums.Tags;
+import ticketing_system.app.percistance.Enums.TicketPriority;
 import ticketing_system.app.percistance.Enums.TicketStatus;
 import ticketing_system.app.percistance.repositories.TicketRepositories.TicketsRepository;
-import ticketing_system.app.preesentation.data.TicketData.TaskDTO;
-import ticketing_system.app.preesentation.data.TicketData.TicketDTO;
+import ticketing_system.app.percistance.repositories.userRepositories.UserRepository;
+import ticketing_system.app.preesentation.data.TicketData.*;
 ;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * the ticket service implementation.
@@ -36,6 +39,10 @@ public class TicketServiceImpl implements TicketService {
     private final TaskService taskService;
     private final TicketsRepository ticketsRepository;
     private final TicketMapper ticketMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
 
     public List<Tickets> getOpenTickets(){
 
@@ -66,7 +73,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Tickets createTicket(@Validated TicketDTO ticketDTO) {
+    public TicketDTO createTicket(@Validated TicketDTO ticketDTO) {
 
         /*map the ticket to DTO*/
         Tickets ticket = ticketMapper.mapToTicket(ticketDTO);
@@ -76,11 +83,14 @@ public class TicketServiceImpl implements TicketService {
         ticket.setDeadline(deadline);
 
         ticket.setTag(Tags.valueOf(ticketDTO.tag()));
+
         ticket.setTicketName(ticketDTO.ticketName());
+
+        ticket.setPriority(TicketPriority.valueOf(ticketDTO.priority()));
 
         ticket.setDescription(ticketDTO.description());
         /*persist the ticket*/
-        return ticketsRepository.save(ticket);
+        return ticketMapper.mapToDTO(ticketsRepository.save(ticket));
     }
 
     @Override
@@ -116,17 +126,23 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void updateTicketById(final long ticketId,@Validated final TicketDTO ticketDTO) {
+    public TicketNormalDTO updateTicketById(final long ticketId, @Validated final TicketDTO ticketDTO) {
 
         /*check if the ticket exists*/
         ticketsRepository.findById(ticketId).ifPresentOrElse(
                 ticket -> {
                     Tickets ticketToSave = ticketMapper.mapToTicket(ticketDTO);
                     ticketToSave.setTicketId(ticket.getTicketId());
+                    ticketToSave.setAgentAssigned(ticket.getAgentAssigned());
+                    ticketToSave.setTasks(ticket.getTasks());
+                    ticketToSave.setStatus(ticket.getStatus());
                     ticketsRepository.save(ticketToSave);
+
                 },
                 taskException::ticketNotFound
         );
+
+        return ticketMapper.mapToNormalDTO(getTicketByTicketId(ticketId));
     }
 
     @Override
@@ -140,34 +156,12 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void addTaskToTicket(final long ticketId,@Validated final TaskDTO taskDTO) {
-
-        log.warn("service entry {}", taskDTO);
-
-        /*check if ticket exists*/
-        ticketsRepository.findById(ticketId).ifPresentOrElse(
-                ticket -> {
-                    /*create the task*/
-                    Tasks task = taskService.createTaskGetTask(taskDTO);
-                    /*add the task to the ticket*/
-                    ticket.getTasks().add(task);
-                    /*update the ticket*/
-                    ticketsRepository.save(ticket);
-                },
-                taskException::ticketNotFound
-        );
-
-        log.warn("service pass {}", taskDTO);
-
-    }
-
-    @Override
     public void deleteTaskFromTicket(final long ticketId,final long taskId) {
 
         /*check if ticket exists*/
         ticketsRepository.findById(ticketId).ifPresentOrElse(
-                ticket -> taskService.deleteTaskById(taskId),
-                taskException::taskNotFound
+                ticket -> taskService.deleteTaskById(taskId, ticketId),
+                taskException::ticketNotFound
         );
     }
 
@@ -187,5 +181,81 @@ public class TicketServiceImpl implements TicketService {
                 },
                 taskException::ticketNotFound
         );
+    }
+
+    @Override
+    public TicketAgentDTO assignTicketToAgent(Long ticketId, Long userId) {
+         AtomicReference<Tickets> ticketToSave = new AtomicReference<>(new Tickets());
+
+        /*check if the ticket exists*/
+        ticketsRepository.findById(ticketId).ifPresentOrElse(
+                ticket -> {
+
+//                    Users agentToBeAssigned = userRepository.findById(userId).get();
+                    userRepository.findById(userId).ifPresentOrElse(
+                            users -> {
+                                //check if user role == agent/admin
+                                String agentRoleName = users.getRole().getRoleName().toLowerCase();
+                                log.info("Agent Role: " + agentRoleName);
+                                if (users != null && agentRoleName.equals("agent")) {
+                                    ticket.setAgentAssigned(users);
+                                    ticketsRepository.save(ticket);
+
+                                }
+                            },
+                            () -> {
+                                throw new RuntimeException("This user cannot be assigned a ticket. " +
+                                        "Check if the user exists and has the correct role");
+                            }
+                    );
+
+                },
+                taskException::ticketNotFound
+        );
+
+        return ticketMapper.mapToAgentDTO(getTicketByTicketId(ticketId));
+    }
+
+    @Override
+    public TicketNormalDTO updateTicketStatus(Long ticketId, TicketStatus ticketStatus) {
+        /*check if the ticket exists*/
+        ticketsRepository.findById(ticketId).ifPresentOrElse(
+                ticket -> {
+                    ticket.setStatus(ticketStatus);
+                    ticketsRepository.save(ticket);
+                },
+                taskException::ticketNotFound
+        );
+
+        return ticketMapper.mapToNormalDTO(getTicketByTicketId(ticketId));
+    }
+
+    @Override
+    public TicketNormalDTO updateTicketPriorityLevel(Long ticketId, TicketPriority ticketPriority) {
+        /*check if the ticket exists*/
+        ticketsRepository.findById(ticketId).ifPresentOrElse(
+                ticket -> {
+                    ticket.setPriority(ticketPriority);
+                    ticketsRepository.save(ticket);
+                },
+                taskException::ticketNotFound
+        );
+
+        return ticketMapper.mapToNormalDTO(getTicketByTicketId(ticketId));
+    }
+
+    @Override
+    public void closeTicket(Long ticketId) {
+        /*check if the ticket exists*/
+        ticketsRepository.findById(ticketId).ifPresentOrElse(
+                ticket -> {
+                    ticket.setStatus(TicketStatus.CLOSED);
+                    ticketsRepository.save(ticket);
+                },
+                ()-> {
+                    throw new TicketNotFoundException("Ticket Not Found");
+                }
+        );
+
     }
 }

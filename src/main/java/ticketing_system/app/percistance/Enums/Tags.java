@@ -7,5 +7,10 @@ public enum Tags {
 
     HR,
     IT,
-    FINANCE
+    FINANCE,
+
+    FRONTEND,
+    BACKEND,
+    NETWORK,
+    TRANSACTIONS
 }
