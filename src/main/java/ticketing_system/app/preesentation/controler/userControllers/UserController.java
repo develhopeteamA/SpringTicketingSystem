@@ -4,16 +4,25 @@ package ticketing_system.app.preesentation.controler.userControllers;
 //import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import ticketing_system.app.Business.implementation.ReportService.UpdateUserReportService;
+import ticketing_system.app.Business.implementation.ReportService.UserReportService;
 import ticketing_system.app.Business.implementation.userServiceImplementations.UserImpematation;
 import ticketing_system.app.Business.servises.UserService;
+import ticketing_system.app.percistance.Entities.userEntities.Users;
+import ticketing_system.app.preesentation.data.ReportDTOs.UpdatedUserReportDTO;
+import ticketing_system.app.preesentation.data.ReportDTOs.UserReportDTO;
 import ticketing_system.app.preesentation.data.userDTOs.UserDTO;
 
+import java.io.FileNotFoundException;
 import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -45,6 +54,12 @@ public class UserController {
     @Autowired
     private  UserImpematation userService;
 
+    @Autowired
+    private UserReportService userReportService;
+
+    @Autowired
+    private UpdateUserReportService updateUserReportService;
+
 
     @Autowired
     public UserController(UserImpematation userImplementation) {
@@ -52,66 +67,88 @@ public class UserController {
     }
 
     @GetMapping("/user/authorities")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<Collection<?>> getUserAuthorities(@RequestParam String username) {
         Collection<?> authorities = userImplementation.getAuthoritiesForUser(username);
         return ResponseEntity.ok(authorities);
     }
     @Operation(description = "Create user REST API")
     @PostMapping("/create")
-    //@PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<?> createUser(@RequestParam("userCreatedEmail") String userCreatedEmail,@RequestParam("positionName") String positionName,@RequestParam("roleName") String roleName, @RequestBody UserDTO userDTO){
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> createUser(@RequestParam("UserCreatorEmail") String userCreatorEmail, @RequestParam("positionName") String positionName,@RequestParam("roleName") String roleName, @RequestBody UserDTO userDTO,HttpServletRequest request){
         try {
             //String token = authorizationHeader;
-            System.out.println(userCreatedEmail);
-            return ResponseEntity.ok(userImplementation.createUser(userCreatedEmail,roleName,positionName, userDTO));
+            System.out.println(userCreatorEmail);
+            Users user = userImplementation.createUser(userCreatorEmail, roleName, positionName, userDTO,getSiteURL(request));
+            Long userId = user.getId();
+            return userReportService.exportUserReport(userId);
         }
          catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (JRException e) {
+            throw new RuntimeException(e);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
 
     @Operation(description = "Update user by Id REST API")
     @PutMapping("/update/{userId}")
-    //@PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> updateUser(@PathVariable("userId") Long userId,@RequestParam("userUpdatedEmail") String userUpdatedEmail,@RequestParam("positionName") String positionName,@RequestParam("roleName") String roleName, @RequestBody UserDTO userDTO){
         try {
             //String token = authorizationHeader;
             System.out.println(userId);
-            return ResponseEntity.ok(userImplementation.updateUser(userId,userUpdatedEmail,roleName,positionName,userDTO));
+           Users user = userImplementation.updateUser(userId,userUpdatedEmail,roleName,positionName,userDTO);
+            Long userUpdatedId = user.getId();
+            return updateUserReportService.exportUserReport(userUpdatedId);
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (JRException e) {
+            throw new RuntimeException(e);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
     @PutMapping("/elevateUserRole")
-    //@PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<?> updateUserRole(@RequestParam("email") String email, @RequestParam("UserNewRoleName") String newRoleName){
-        return ResponseEntity.ok(userImplementation.updateUserRole(email,newRoleName));
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> updateUserRole(@RequestParam("email") String email, @RequestParam("UserNewRoleName") String newRoleName) throws JRException, FileNotFoundException {
+        Users user = userImplementation.updateUserRole(email,newRoleName);
+        Long userId = user.getId();
+        return userReportService.exportUserReport(userId);
     }
 
     @Operation(description = "Get all users REST API")
     @GetMapping("/retrieve")
-    //@PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<?> retrieveUsers(){
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> retrieveUsers() throws JRException, FileNotFoundException {
        // String token = authorizationHeader;
-        return ResponseEntity.ok(userImplementation.retrieveUsers());
+         userImplementation.retrieveUsers();
+        return userReportService.exportReport();
     }
 
     @Operation(description = "Get user by Id REST API")
     @GetMapping("/retrieveById/{userId}")
-    //@PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('admin') or hasAuthority('agent')")
     public ResponseEntity<?> retrieveUserById(@PathVariable("userId") Long userId){
         try {
            // String token = authorizationHeader;
-            return ResponseEntity.ok(userImplementation.retrieveUserById(userId));
+            Users user = userImplementation.retrieveUserById(userId);
+            Long userRetrievedId = user.getId();
+            return userReportService.exportUserReport(userRetrievedId);
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (JRException e) {
+            throw new RuntimeException(e);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Operation(description = "Delete user by Id REST API")
     @DeleteMapping("/deleteById/{userId}")
-    //@PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> deleteUserById(@PathVariable("userId") Long userId){
         try {
             //String token = authorizationHeader;
@@ -126,5 +163,10 @@ public class UserController {
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    private String getSiteURL(HttpServletRequest request) {
+        String siteURL = request.getRequestURL().toString();
+        return siteURL.replace(request.getServletPath(), "");
     }
 }

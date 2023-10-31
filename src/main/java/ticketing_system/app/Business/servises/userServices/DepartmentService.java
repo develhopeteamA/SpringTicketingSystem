@@ -6,7 +6,7 @@ import ticketing_system.app.preesentation.data.userDTOs.DepartmentDTO;
 import java.util.List;
 
 public interface DepartmentService {
-    DepartmentDTO createDepartment(String departmentCreatedEmail, String departmentDirectorEmail,DepartmentDTO departmentDTO);
+    Department createDepartment(String departmentCreatedEmail, String departmentDirectorEmail,DepartmentDTO departmentDTO);
     List<DepartmentDTO> retrieveDepartments();
 
     DepartmentDTO retrieveDepartmentById(Long departmentId);

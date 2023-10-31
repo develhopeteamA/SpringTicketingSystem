@@ -1,16 +1,25 @@
 package ticketing_system.app.Business.implementation.userServiceImplementations;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.internal.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ticketing_system.app.Business.implementation.ReportService.UserReportService;
 import ticketing_system.app.Business.servises.userServices.UserService;
+import ticketing_system.app.exceptions.TaskNotFoundException;
+import ticketing_system.app.percistance.Entities.TicketEntities.Tickets;
 import ticketing_system.app.percistance.Entities.userEntities.Positions;
 import ticketing_system.app.percistance.Entities.userEntities.Role;
 import ticketing_system.app.percistance.Entities.userEntities.Users;
@@ -19,6 +28,7 @@ import ticketing_system.app.percistance.repositories.userRepositories.UserReposi
 import ticketing_system.app.preesentation.data.userDTOs.UserDTO;
 
 import javax.sql.DataSource;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -77,6 +87,12 @@ public class UserImpematation implements UserService  {
     @Autowired
     RoleRepository roleRepository;
 
+    @Autowired
+    private UserReportService userReportService;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
 
     @Autowired
     public UserImpematation(ModelMapper modelMapper,
@@ -117,7 +133,7 @@ public class UserImpematation implements UserService  {
     }
 
     @Override
-    public Users createUser(String userEmailCreated, String roleName, String positionName, UserDTO userDTO) {
+    public Users createUser(String userEmailCreated, String roleName, String positionName, UserDTO userDTO,String siteURL) {
 
         if (userDTO.getFirstName().isBlank() || userDTO.getFirstName() == null) {
             throw new IllegalArgumentException("Users first name can neither be null nor blank");
@@ -148,10 +164,13 @@ public class UserImpematation implements UserService  {
         //set created by
         Users createdByUsers = retrieveUserByEmail(userEmailCreated);
         System.out.println(createdByUsers);
-       user.setCreatedBy(createdByUsers.getCreatedBy());
+       user.setCreatedBy(Math.toIntExact(createdByUsers.getId()));
+
+        String randomCode = RandomString.make(64);
+        user.setVerificationCode(randomCode);
 
        //enable
-        user.setEnabled(true);
+        user.setEnabled(false);
 
         // Hash the user's password before storing it in the database
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
@@ -161,7 +180,10 @@ public class UserImpematation implements UserService  {
     if (userInDb !=null && userInDb.equals(user)){
         throw new IllegalArgumentException("User exist");
     }
-        return userRepository.save(user);
+        Users users = userRepository.save(user);
+
+        sendVerificationEmail(user, siteURL);
+        return users;
     }
 
     @Override
@@ -202,41 +224,48 @@ public class UserImpematation implements UserService  {
     }
 
     @Override
-    public Users updateUser(Long userId,String userUpdatingEmail,String roleName,String positionName,UserDTO userDTO) {
-        if (userRepository.existsById(userId)) {
-
-            System.out.println(userId);
-
-            Users user = convertToUser(userDTO);
-            //set id
-            user.setId(userId);
-
-            //set updated on
-            user.setUpdatedOn(currentTimestampFormatted);
-
-            //set enable
-            user.setEnabled(true);
-            //set position
-            Positions userPosition = positionService.retrievePositionByName(positionName);
-            user.setPositions(userPosition);
-            //set role
-            Role userRole = roleService.retrieveRoleByName(roleName);
-            user.setRole(userRole);
-
-            //set updated by
-            Users updatedByUsers = retrieveUserByEmail(userUpdatingEmail);
-            System.out.println(updatedByUsers);
-            user.setUpdatedBy(updatedByUsers.getId());
-
-            // Hash the user's password before storing it in the database
-            String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
-            user.setPassword(encodedPassword);
-
-
-            return userRepository.save(user);
-
+    public Users updateUser(Long userId,String userUpdatingEmail,String roleName,String positionName,@Validated final UserDTO userDTO) {
+        class UserWrapper {
+            Users user;
         }
-        return null;
+
+        UserWrapper userWrapper = new UserWrapper();
+
+        userRepository.findById(userId).ifPresent(
+                user -> {
+                    Users userToSave = convertToUser(userDTO);
+                    userToSave.setId(userId);
+                    userToSave.setUpdatedOn(currentTimestampFormatted);
+                    userToSave.setEnabled(true);
+
+                    Positions userPosition = positionService.retrievePositionByName(positionName);
+                    userToSave.setPositions(userPosition);
+                    // set role
+                    Role userRole = roleService.retrieveRoleByName(roleName);
+                    userToSave.setRole(userRole);
+
+                    // set updated by
+                    Users updatedByUsers = retrieveUserByEmail(userUpdatingEmail);
+                    System.out.println(updatedByUsers);
+                    if (updatedByUsers != null) {
+                        userToSave.setUpdatedBy(updatedByUsers.getId());
+                    }
+
+                    // Hash the user's password before storing it in the database
+                    String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+                    userToSave.setPassword(encodedPassword);
+
+                    userRepository.save(userToSave);
+
+                    userWrapper.user = userToSave;
+                }
+        );
+
+        if (userWrapper.user == null) {
+            throw new TaskNotFoundException("Task not found");
+        }
+
+        return userWrapper.user;
     }
     @Override
     public boolean deleteUserById(Long userId) {
@@ -266,7 +295,7 @@ public class UserImpematation implements UserService  {
 
 
     @Override
-    public Users createUserIn(String roleName, String positionName,UserDTO userDTO) {
+    public Users createUserIn(String roleName, String positionName,UserDTO userDTO,String siteURL) {
 
         if (userDTO.getFirstName().isBlank() || userDTO.getFirstName() == null) {
             throw new IllegalArgumentException("Users first name can neither be null nor blank");
@@ -300,8 +329,11 @@ public class UserImpematation implements UserService  {
         System.out.println(createdByUsers);
         user.setCreatedBy(0);
 
+        String randomCode = RandomString.make(64);
+        user.setVerificationCode(randomCode);
+
         //set enabled
-        user.setEnabled(true);
+        user.setEnabled(false);
 
         // Hash the user's password before storing it in the database
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
@@ -313,8 +345,62 @@ public class UserImpematation implements UserService  {
         }
 
         Users savedUsers = this.userRepository.save(user);
+        sendVerificationEmail(user, siteURL);
         return savedUsers;
     }
 
+    @Override
+     public void sendVerificationEmail(Users user, String siteURL) {
+        String toAddress = user.getEmail();
+        String fromAddress = "murangirimaron@gmail.com";
+        String senderName = "KeMaTCo";
+        String subject = "Please verify your registration";
+        String content = "Dear [[name]],<br>"
+                + "Please click the link below to verify your registration:<br>"
+                + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
+                + "Thank you,<br>"
+                + "KeMaTCo LTD.";
 
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        try {
+            helper.setFrom(fromAddress, senderName);
+
+            helper.setTo(toAddress);
+
+            helper.setSubject(subject);
+
+
+        content = content.replace("[[name]]", user.getFirstname());
+        String verifyURL = siteURL + "/api/v1/sign/verify?code=" + user.getVerificationCode();
+
+        content = content.replace("[[URL]]", verifyURL);
+
+
+        helper.setText(content, true);
+    } catch (MessagingException | UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
+        mailSender.send(message);
+
+    }
+
+    public boolean verify(String verificationCode) {
+        Users user = userRepository.findByVerificationCode(verificationCode);
+        System.out.println(user);
+        System.out.println(user.getVerificationCode());
+        /*if (user.getVerificationCode().isBlank() || user.isEnabled()) {
+            return false;
+        } else {*/
+            user.setVerificationCode(null);
+            user.setEnabled(true);
+            userRepository.save(user);
+
+            return true;
+
+
+
+    }
 }

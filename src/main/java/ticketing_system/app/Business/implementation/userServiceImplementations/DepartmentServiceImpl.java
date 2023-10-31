@@ -3,6 +3,7 @@ package ticketing_system.app.Business.implementation.userServiceImplementations;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ticketing_system.app.Business.servises.userServices.DepartmentService;
 import ticketing_system.app.percistance.Entities.userEntities.Department;
@@ -73,7 +74,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public DepartmentDTO createDepartment(String departmentCreatedEmail,String departmentDirectorEmail,DepartmentDTO departmentDTO) {
+    public Department createDepartment(String departmentCreatedEmail, String departmentDirectorEmail, DepartmentDTO departmentDTO) {
         if (departmentDTO.getDepartmentName().isBlank() || departmentDTO.getDepartmentName() == null) {
             throw new IllegalArgumentException("Item name can neither be null nor blank");
         }
@@ -95,11 +96,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         //set created by
         Users createdByUsers = userImpematation.retrieveUserByEmail(departmentCreatedEmail);
         System.out.println(createdByUsers);
-        department.setCreatedBy(createdByUsers.getCreatedBy());
+        department.setCreatedBy(Math.toIntExact(createdByUsers.getId()));
 
         //Department departments = convertToDepartment(department);
 
-        return this.convertToDto(departmentRepository.save(department));
+        return departmentRepository.save(department);
     }
 
     @Override
@@ -119,13 +120,11 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public DepartmentDTO updateDepartment(Long departmentId,String departmentCreatedEmail,String departmentDirectorEmail, DepartmentDTO departmentDTO) {
         if (departmentRepository.existsById(departmentId)){
-
             Department department = convertToDepartment(departmentDTO);
             //set department Id
             department.setDepartmentId(departmentId);
             //set updated on
             department.setUpdatedOn(currentTimestampFormatted);
-
 
             //set department director
             Users departmentDirector = userImpematation.retrieveUserByEmail(departmentDirectorEmail);
@@ -134,7 +133,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             //set created by
             Users createdByUsers = userImpematation.retrieveUserByEmail(departmentCreatedEmail);
             System.out.println(createdByUsers);
-            department.setUpdatedBy(createdByUsers.getCreatedBy());
+            department.setUpdatedBy(Math.toIntExact(createdByUsers.getId()));
              return convertToDto(departmentRepository.save(department));
         }
         throw new IllegalArgumentException("Department not found");

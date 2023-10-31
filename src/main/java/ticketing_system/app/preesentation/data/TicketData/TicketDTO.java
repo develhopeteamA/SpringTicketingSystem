@@ -15,10 +15,10 @@ public record TicketDTO(
         @SchemaProperty(name = "description")
         String description,
         @SchemaProperty(name = "tag")
-        String tag,
-        @SchemaProperty(name = "priority" )
+        String tag
+        /*@SchemaProperty(name = "priority" )
         String priority,
         @SchemaProperty(name = "deadline")
-        String deadline
+        String deadline*/
 ) implements DTOType{
 }

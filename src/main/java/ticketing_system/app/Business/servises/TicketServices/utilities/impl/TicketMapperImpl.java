@@ -37,8 +37,8 @@ public class TicketMapperImpl implements TicketMapper {
         map.setTicketName(ticketDTO.ticketName());
         map.setDescription(ticketDTO.description());
         map.setTag(Tags.valueOf(ticketDTO.tag()));
-        map.setPriority(TicketPriority.valueOf(ticketDTO.priority()));
-        map.setDeadline(LocalDate.parse(ticketDTO.deadline(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        //map.setPriority(TicketPriority.valueOf(ticketDTO.priority()));
+        //map.setDeadline(LocalDate.parse(ticketDTO.deadline(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         return map;
     }
 
@@ -47,7 +47,7 @@ public class TicketMapperImpl implements TicketMapper {
     @Override
     public TicketDTO mapToDTO(Tickets tickets) {
 
-        return new TicketDTO(tickets.getTicketName(),tickets.getDescription(),tickets.getTag().toString(), tickets.getPriority().toString(),tickets.getDeadline().toString());
+        return new TicketDTO(tickets.getTicketName(),tickets.getDescription(),tickets.getTag().toString());
     }
 
     /**

@@ -1,12 +1,16 @@
 package ticketing_system.app.Business.implementation.MessagingServiceImpl;
 
+import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ticketing_system.app.Business.implementation.ReportService.MessageReportService;
 import ticketing_system.app.Business.servises.MessageService.MessagingService;
 import ticketing_system.app.percistance.Entities.Message.Message;
 import ticketing_system.app.percistance.repositories.MessageRepository.MessageRepository;
 
 
+import java.io.FileNotFoundException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -27,6 +31,8 @@ public class MessagingServiceImpl implements MessagingService {
 
     private final MessageRepository messageRepository;
 
+    @Autowired
+    private MessageReportService messageReportService;
 
     @Autowired
     public MessagingServiceImpl(MessageRepository messageRepository) {
@@ -34,44 +40,72 @@ public class MessagingServiceImpl implements MessagingService {
     }
 
     @Override
-    public Message sendMessage(Long senderId, Long receiverId, String content) {
+    public ResponseEntity<?> sendMessage(Long senderId, Long receiverId, String content) {
         // Implement the logic to send a message
         Message message = new Message();
         message.setSenderId(senderId);
         message.setReceiverId(receiverId);
         message.setContent(content);
         message.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        return messageRepository.save(message);
+        Message messageSaved = messageRepository.save(message);
+        try {
+            return messageReportService.exportMessageReport(messageSaved.getId());
+        } catch (FileNotFoundException e) {
+        } catch (JRException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
     @Override
-    public Message editMessage(Long messageId, String content) {
+    public ResponseEntity<?> editMessage(Long messageId, String content) {
         // Implement the logic to edit a message by ID
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
         if (optionalMessage.isPresent()) {
             Message message = optionalMessage.get();
             message.setContent(content);
             message.setTimestamp(new Timestamp(System.currentTimeMillis()));
-            return messageRepository.save(message);
+             messageRepository.save(message);
+            try {
+                return messageReportService.exportMessageReport(messageId);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (JRException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             throw new IllegalArgumentException("Message not found");
         }
     }
 
     @Override
-    public List<Message> searchMessages(String keyword) {
-        return messageRepository.findAll().stream()
+    public ResponseEntity<?> searchMessages(String keyword) {
+         /*messageRepository.findAll().stream()
                 .filter(message -> message.getContent().contains(keyword))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
+        try {
+            return messageReportService.exportReportByKeyword(keyword);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (JRException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     @Override
-    public List<Message> getMessages(Long userId) {
+    public ResponseEntity<?> getMessages(Long userId) {
         // Implement the logic to retrieve messages for a specific user
-        return messageRepository.findAll().stream()
+         /*messageRepository.findAll().stream()
                 .filter(message -> message.getReceiverId().equals(userId))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
+        try {
+            return messageReportService.exportReportByUser(userId);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (JRException e) {
+            throw new RuntimeException(e);
+        }
     }
     @Override
     public void deleteMessage(Long messageId) {

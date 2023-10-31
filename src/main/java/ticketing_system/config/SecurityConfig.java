@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
@@ -19,6 +20,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 //import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
+@EnableWebSecurity
 @EnableMethodSecurity()
 public class SecurityConfig {
 
@@ -30,14 +32,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
+       return http
                 .authorizeRequests()
-                .requestMatchers("/api").hasAuthority("admin")
+               .requestMatchers("/api/v1/sign").permitAll()
+                //.requestMatchers("/api").hasAuthority("admin")
                 //.anyRequest().authenticated()
                                 //.anyRequest()
                                 //.authenticated()
                 .and()
-                .httpBasic(withDefaults())
+                //.httpBasic(withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .addFilterBefore(anonymousAuthenticationFilter(), AnonymousAuthenticationFilter.class)
                 .formLogin(formLogin ->
@@ -48,17 +51,19 @@ public class SecurityConfig {
                 .logout(logout ->
                         logout
                                 .logoutUrl("/logout") // Specify the URL for logout
-                                .logoutSuccessUrl("/login?logout")// Redirect to login page after logout
+                                .logoutSuccessUrl("/login")// Redirect to login page after logout
                                 .deleteCookies("JSESSIONID") // Delete cookies, if needed
                                 .invalidateHttpSession(true) // Invalidating the HTTP session
 
-                );
+                )
+               .userDetailsService(userDetailsService)
+               .build();
 
 
 
-        return http
+       /* return http
                 .userDetailsService(userDetailsService)
-                .build();
+                .build();*/
     }
 
     @Bean

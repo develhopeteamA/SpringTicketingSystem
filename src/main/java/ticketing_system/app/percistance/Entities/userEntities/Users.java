@@ -72,7 +72,7 @@ public class Users implements UserDetails {
 
    // @ApiModelProperty(value = "User position")
     @ManyToOne(targetEntity = Positions.class)
-    @JoinColumn(name = "position_id", insertable = true, updatable = true)
+    @JoinColumn(name = "position_id")
     private Positions positions;
 
     @ManyToOne(targetEntity = Role.class)
@@ -104,8 +104,11 @@ public class Users implements UserDetails {
     @Column(name = "is_enabled")
     private boolean isEnabled;
 
+    @Column(name = "verification_code",length = 64)
+    private String verificationCode;
 
-    public Users(Long id,boolean isEnabled, String firstname, String surname, String email, String password, Positions positions, Role role, int createdBy, Timestamp createdOn, Long updatedBy, Timestamp updatedOn) {
+
+    public Users(Long id,String verificationCode,boolean isEnabled, String firstname, String surname, String email, String password, Positions positions, Role role, int createdBy, Timestamp createdOn, Long updatedBy, Timestamp updatedOn) {
         this.id = id;
         this.firstname = firstname;
         this.surname = surname;
@@ -118,6 +121,7 @@ public class Users implements UserDetails {
         this.updatedOn = updatedOn;
         this.email = email;
         this.isEnabled = isEnabled;
+        this.verificationCode = verificationCode;
     }
 
     public Users() {

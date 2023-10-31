@@ -4,7 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import lombok.Data;
+import lombok.*;
 
 /**
  * class to represent a task.
@@ -12,11 +12,15 @@ import lombok.Data;
 
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class Tasks {
 
     @Id
     @GeneratedValue
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private long taskId;
     @Column(nullable = false)
     private String description;

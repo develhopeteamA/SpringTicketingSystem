@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ticketing_system.app.Business.servises.MessageService.MessagingService;
 import ticketing_system.app.percistance.Entities.Message.Message;
@@ -24,12 +25,12 @@ public class MessagingController {
 
     @PostMapping("/send")
     @Operation(summary = "sends massages ")
-    public ResponseEntity<Message> sendMessage(@RequestParam("senderId") Long senderId,
+    @PreAuthorize("hasAuthority('admin')  or hasAuthority('agent') or hasAuthority('user')")
+    public ResponseEntity<?> sendMessage(@RequestParam("senderId") Long senderId,
                                                @RequestParam("receiverId") Long receiverId,
                                                @RequestParam("content") String content) {
         try {
-            Message message = messagingService.sendMessage(senderId, receiverId, content);
-            return ResponseEntity.ok(message);
+            return messagingService.sendMessage(senderId, receiverId, content);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -37,10 +38,11 @@ public class MessagingController {
 
     @GetMapping("/inbox/{userId}")
     @Operation(summary = "Recieves massages ")
-    public ResponseEntity<List<Message>> getMessages(@PathVariable("userId") Long userId) {
+    @PreAuthorize("hasAuthority('admin')  or hasAuthority('agent') or hasAuthority('user')")
+    public ResponseEntity<?> getMessages(@PathVariable("userId") Long userId) {
         try {
-            List<Message> messages = messagingService.getMessages(userId);
-            return ResponseEntity.ok(messages);
+            return messagingService.getMessages(userId);
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
@@ -48,6 +50,7 @@ public class MessagingController {
 
     @DeleteMapping("/{messageId}")
     @Operation(summary = "deletes massages")
+    @PreAuthorize("hasAuthority('admin')  or hasAuthority('agent') or hasAuthority('user')")
     public ResponseEntity<String> deleteMessage(@PathVariable("messageId") Long messageId) {
         try {
             messagingService.deleteMessage(messageId);
@@ -59,10 +62,10 @@ public class MessagingController {
 
     @GetMapping("/search")
     @Operation(summary = "queries massages")
-    public ResponseEntity<List<Message>> searchMessages(@RequestParam("keyword") String keyword) {
+    @PreAuthorize("hasAuthority('admin')  or hasAuthority('agent') or hasAuthority('user')")
+    public ResponseEntity<?> searchMessages(@RequestParam("keyword") String keyword) {
         try {
-            List<Message> messages = messagingService.searchMessages(keyword);
-            return ResponseEntity.ok(messages);
+             return  messagingService.searchMessages(keyword);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
@@ -70,11 +73,11 @@ public class MessagingController {
 
     @PutMapping("/{messageId}")
     @Operation(summary = "edits massages")
-    public ResponseEntity<Message> editMessage(@PathVariable("messageId") Long messageId,
+    @PreAuthorize("hasAuthority('admin')  or hasAuthority('agent') or hasAuthority('user')")
+    public ResponseEntity<?> editMessage(@PathVariable("messageId") Long messageId,
                                                @RequestParam("content") String content) {
         try {
-            Message editedMessage = messagingService.editMessage(messageId, content);
-            return ResponseEntity.ok(editedMessage);
+            return messagingService.editMessage(messageId, content);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }

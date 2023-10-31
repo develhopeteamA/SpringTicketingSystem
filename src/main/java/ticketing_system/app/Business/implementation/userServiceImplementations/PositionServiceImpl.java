@@ -113,7 +113,7 @@ public class PositionServiceImpl implements PositionService {
         //set created by
         Users createdByUsers = userImpematation.retrieveUserByEmail(positionCreatedEmail);
         System.out.println(createdByUsers);
-        position.setCreatedBy(createdByUsers.getCreatedBy());
+        position.setCreatedBy(Math.toIntExact(createdByUsers.getId()));
 
             Positions savedPositions = positionRepository.save(position);
             return savedPositions;

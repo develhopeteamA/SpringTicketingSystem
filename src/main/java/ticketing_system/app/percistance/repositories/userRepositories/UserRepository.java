@@ -29,4 +29,7 @@ public interface UserRepository extends JpaRepository<Users,Long> {
     @Query("UPDATE Users u SET u.role = :newRole WHERE u.email = :email")
     void updateRoleByEmail(@Param("email") String email, @Param("newRole") Role newRole);
 
+    @Query("SELECT u FROM Users u WHERE u.verificationCode = ?1")
+    Users findByVerificationCode(String code);
+
 }
