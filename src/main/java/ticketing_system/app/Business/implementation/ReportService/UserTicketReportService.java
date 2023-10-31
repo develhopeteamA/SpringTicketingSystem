@@ -64,7 +64,7 @@ public class UserTicketReportService {
         // JasperExportManager.exportReportToPdfFile(jasperPrint, "/home/maron/DevelhopeTReport/PDFReports/tickets.pdf");
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=tickets.pdf");
+        //headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=tickets.pdf");
         //"attachment; filename=/home/maron/DevelhopeTReport/PDFReports/tickets.pdf"
         headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 

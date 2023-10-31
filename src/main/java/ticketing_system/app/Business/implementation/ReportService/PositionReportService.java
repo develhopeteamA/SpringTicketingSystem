@@ -83,7 +83,7 @@ public class PositionReportService {
 
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=positions.pdf");
+            //headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=positions.pdf");
             headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
             //return reportBytes;
@@ -115,7 +115,7 @@ public class PositionReportService {
 
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=position.pdf");
+       // headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=position.pdf");
         headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
         //return reportBytes;

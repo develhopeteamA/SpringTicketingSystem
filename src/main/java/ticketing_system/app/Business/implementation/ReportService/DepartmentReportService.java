@@ -85,7 +85,7 @@ public class DepartmentReportService {
 
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=departments.pdf");
+            //headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=departments.pdf");
             headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
             //return reportBytes;
@@ -116,7 +116,7 @@ public class DepartmentReportService {
 
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=department.pdf");
+        //headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=department.pdf");
         headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
         //return reportBytes;

@@ -77,7 +77,7 @@ public class RoleReportService {
 
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=roles.pdf");
+        //headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=roles.pdf");
         //"attachment; filename=/home/maron/DevelhopeTReport/PDFReports/tickets.pdf"
         headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
@@ -112,7 +112,7 @@ public class RoleReportService {
 
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=role.pdf");
+        //headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=role.pdf");
 
         headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 

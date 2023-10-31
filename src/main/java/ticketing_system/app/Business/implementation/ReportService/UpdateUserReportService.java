@@ -90,7 +90,7 @@ public class UpdateUserReportService {
         reportBytes = JasperExportManager.exportReportToPdf(jasperPrint);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=users.pdf");
+        //headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=users.pdf");
         //"attachment; filename=/home/maron/DevelhopeTReport/PDFReports/tickets.pdf"
         headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
@@ -120,7 +120,7 @@ public class UpdateUserReportService {
         reportBytes = JasperExportManager.exportReportToPdf(jasperPrint);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=users.pdf");
+        //headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=users.pdf");
         //"attachment; filename=/home/maron/DevelhopeTReport/PDFReports/tickets.pdf"
         headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 

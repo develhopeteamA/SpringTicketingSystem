@@ -27,7 +27,8 @@ public class SignUpController {
         public ResponseEntity<?> createUserAccount(@RequestParam("positionName") String positionName, @RequestBody UserDTO userDTO, HttpServletRequest request){
             try {
                 String roleName = "user";
-                return ResponseEntity.ok(userImpematation.createUserIn(roleName,positionName,userDTO,getSiteURL(request)));
+                userImpematation.createUserIn(roleName,positionName,userDTO,getSiteURL(request));
+                return ResponseEntity.ok("Your account has been created.\n Find the account ACTIVATION LINK in your email to verify your email address");
             }
             catch (IllegalArgumentException e){
                 return ResponseEntity.badRequest().body(e.getMessage());

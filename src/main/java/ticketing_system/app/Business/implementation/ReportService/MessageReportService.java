@@ -101,7 +101,7 @@ public class MessageReportService {
 
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=messages.pdf");
+           // headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=messages.pdf");
             headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
             //return reportBytes;
@@ -134,7 +134,7 @@ public class MessageReportService {
 
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=messages.pdf");
+        //headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=messages.pdf");
         headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
         //return reportBytes;
@@ -167,7 +167,7 @@ public class MessageReportService {
 
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=messages.pdf");
+        //headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=messages.pdf");
         headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
         //return reportBytes;
@@ -199,7 +199,7 @@ public class MessageReportService {
 
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=message.pdf");
+            //headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=message.pdf");
             headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
 
             //return reportBytes;
