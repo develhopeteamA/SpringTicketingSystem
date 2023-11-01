@@ -3,7 +3,6 @@ package ticketing_system.app.Business.implementation.ApplicationEvents.CustomEve
 import lombok.Data;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
-import ticketing_system.app.Business.implementation.ApplicationEvents.Events.TicketCreatedEvent;
 import ticketing_system.app.Business.implementation.ApplicationEvents.Events.TicketStatusUpdateEvent;
 
 @Data

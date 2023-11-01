@@ -5,9 +5,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ticketing_system.app.Business.implementation.ApplicationEvents.CustomEvents.CustomAddTaskToTicketEvent;
-import ticketing_system.app.Business.implementation.ApplicationEvents.CustomEvents.CustomAgentAssignmentEvents;
 import ticketing_system.app.Business.implementation.ApplicationEvents.Events.AddTaskToTicketEvent;
-import ticketing_system.app.Business.implementation.ApplicationEvents.Events.AgentAssignmentEvent;
 import ticketing_system.app.Business.implementation.EmailSenderService.EmailSenderService;
 import ticketing_system.app.Business.implementation.ReportService.TicketReportService;
 import ticketing_system.app.percistance.Entities.TicketEntities.Tickets;
@@ -38,8 +36,20 @@ public class AddTaskToTicketEventsListener {
         System.out.println(userName);
         // Send an email using the sender service
 
-        String emailMessage = "Dear "+ userName+",\nWe have received an additional task related to ticket of Id: " + ticket.getTicketId()+"\n We are working on your ticket, update us on any further issue from your end" +
-                " \nHere is the ticket details: http://localhost:8080/api/v1/tickets/byId/"+ticket.getTicketId()+"\n We appreciate your effort to give us an elaborate and clear image on the ticket by providing additional tasks, We value your satisfaction and feedback\n\n\n Regards, \nKeMaTCo LTD support Team";
+        String emailMessage = "Dear [[name]],<br>"
+                +"We have received an additional task related to ticket of  Id: " + ticket.getTicketId()+" ,<br>"
+                +"We are working on your ticket, update us on any further issue from your end, <br>"
+                + "To check the ticket details, click on the link below:<br>"
+                + "<h5><a href=\"[[URL]]\" target=\"_self\">TICKET</a></h5>"
+                +"We appreciate your effort to give us an elaborate and clear image on the ticket by providing additional tasks, We value your satisfaction and feedback, <br>"
+                + "Thank you,<br>"
+                + "KeMaTCo LTD support team.";
+
+
+        emailMessage = emailMessage.replace("[[name]]", userName);
+        String verifyURL = "http://localhost:8080/api/v1/tickets/byId/" +ticket.getTicketId();
+
+        emailMessage = emailMessage.replace("[[URL]]", verifyURL);
 
         assert loggedUser != null;
         senderService.sendSimpleEmail(loggedUser.getUsername(), "TICKET ADD ONS", emailMessage);

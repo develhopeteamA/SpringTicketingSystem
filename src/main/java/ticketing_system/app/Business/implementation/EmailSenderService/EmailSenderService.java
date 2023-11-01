@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 
 @Service
 public class EmailSenderService {
@@ -20,15 +21,36 @@ public class EmailSenderService {
     private JavaMailSender mailSender;
 
     public void sendSimpleEmail(String toEmail,
-                                String subject,
+                                String subjects,
                                 String body
     ) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("murangirimaron@gmail.com");
-        message.setTo(toEmail);
-        message.setText(body);
-        message.setSubject(subject);
+
+        String toAddress = toEmail;
+        String fromAddress = "kematco.ltd@gmail.com";
+        String senderName = "KeMaTCo";
+        String subject = subjects;
+        String content = body;
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        try {
+            helper.setFrom(fromAddress, senderName);
+
+            helper.setTo(toAddress);
+
+            helper.setSubject(subject);
+
+
+
+            helper.setText(content, true);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
         mailSender.send(message);
+
+
         System.out.println("Mail Sent...");
     }
 }

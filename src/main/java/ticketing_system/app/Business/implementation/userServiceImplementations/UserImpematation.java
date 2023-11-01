@@ -352,7 +352,7 @@ public class UserImpematation implements UserService  {
     @Override
      public void sendVerificationEmail(Users user, String siteURL) {
         String toAddress = user.getEmail();
-        String fromAddress = "murangirimaron@gmail.com";
+        String fromAddress = "kematco.ltd@gmail.com";
         String senderName = "KeMaTCo";
         String subject = "Please verify your registration";
         String content = "Dear [[name]],<br>"

@@ -23,6 +23,8 @@ import ticketing_system.app.percistance.Entities.userEntities.Users;
  */
 @Repository
 public interface UserRepository extends JpaRepository<Users,Long> {
+
+
     Users findByEmail(String email);
     @Modifying
     @Transactional

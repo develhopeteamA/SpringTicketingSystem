@@ -41,16 +41,23 @@ public class TicketEventsListener {
         }
         System.out.println(userName);
         // Send an email using the sender service
-        try {
-            String reportUrl = String.valueOf(reportService.exportTicketReport(ticket.getTicketId()));
-            String emailMessage = "Dear "+ userName+",\nWe have received your ticket with ID: " + ticket.getTicketId() +
-                    " \nHere is the ticket details: http://localhost:8080/api/v1/tickets/byId/"+ticket.getTicketId()+"\n Thank you for creating a ticket with us, we will get back to you as soon as possible\n\n\n Regards, \nKeMaTCo LTD support Team";
+        String emailMessage = "Dear [[name]],<br>"
+                +"We have received your ticket with ticket Id: " + ticket.getTicketId()+" ,<br>"
+                + "To check the ticket details, click on the link below:<br>"
+                + "<h5><a href=\"[[URL]]\" target=\"_self\">TICKET</a></h5>"
+                + "Thank you,<br>"
+                + "KeMaTCo LTD support team.";
 
-            assert loggedUser != null;
-            email =loggedUser.getUsername();
-            senderService.sendSimpleEmail(loggedUser.getUsername(), "TICKET CREATED SUCCESSFULLY", emailMessage);
-        } catch (FileNotFoundException | JRException e) {
-            throw new RuntimeException(e);
-        }
+
+        emailMessage = emailMessage.replace("[[name]]", userName);
+        String verifyURL = "http://localhost:8080/api/v1/tickets/byId/" +ticket.getTicketId();
+
+        emailMessage = emailMessage.replace("[[URL]]", verifyURL);
+
+        assert loggedUser != null;
+        System.out.println(loggedUser.getEmail());
+        System.out.println(loggedUser.getUsername());
+        senderService.sendSimpleEmail(loggedUser.getUsername(), "TICKET CREATED SUCCESSFULLY", emailMessage);
+
     }
 }
